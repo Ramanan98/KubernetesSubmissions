@@ -15,3 +15,6 @@ spec:
       containers:
         - name: todo-app
           image: ramanan98/todo-app@sha256:f6c3bd94a73774f75cdba6e2c9cf11761a9c4e697d883241b94b27030e8d5950
+          env:
+            - name: PORT
+              value: "8080"
