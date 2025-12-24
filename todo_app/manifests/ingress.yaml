@@ -10,6 +10,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: log-output-svc
+                name: todo-app-svc
                 port:
                   number: 2345

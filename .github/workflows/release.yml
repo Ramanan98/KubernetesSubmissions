@@ -1,0 +1,40 @@
+name: Create release for exercise
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Release on commit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Extract version from commit
+        id: get_version
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Commit message: $COMMIT_MSG"
+          if [[ $COMMIT_MSG =~ ^ex-(.*) ]]; then
+            VERSION=${BASH_REMATCH[1]}
+            echo "Version detected: $VERSION"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "No ex-* commit message. Skipping release."
+            exit 0
+          fi
+
+      - name: Create GitHub Release
+        if: steps.get_version.outputs.version != ''
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          release_name: ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
