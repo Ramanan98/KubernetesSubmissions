@@ -14,6 +14,8 @@ class Handler(BaseHTTPRequestHandler):
         response = f"pong {Handler.counter}"
         self.wfile.write(response.encode())
         Handler.counter += 1
+        with open("/usr/src/app/files/pingpongs.txt", "w") as f:
+            f.write(str(Handler.counter))
 
 
 HTTPServer(("", port), Handler).serve_forever()

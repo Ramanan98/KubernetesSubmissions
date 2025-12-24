@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ping-pong-app-dep
+  name: ping-pong-dep
 spec:
   replicas: 1
   selector:
@@ -12,9 +12,24 @@ spec:
       labels:
         app: ping-pong-app
     spec:
+      volumes:
+        - name: shared-logs
+          persistentVolumeClaim:
+            claimName: ping-pong-logs-claim
       containers:
-        - name: ping-pong-app
-          image: ramanan98/ping-pong-app@sha256:37c2607260f72f240f7dd2e72a0954bc9bcc5c3b359458a4cd6f2bfc27ac82d9
+        - name: ping-pong
+          image: ramanan98/ping-pong@sha256:21cad2769498f7b81384869599fd9bb6977ab47ac582ac5948a03a7d0bf7ad90
           env:
             - name: PORT
               value: "8080"
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /usr/src/app/files
+        - name: log-output
+          image: ramanan98/log-output-app@sha256:f1d8e4ba92670a914d6d17127f5adbda4bfa3e43caa8a2fd6a504c374d7a797e
+          env:
+            - name: PORT
+              value: "8081"
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /usr/src/app/files
