@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ping-pong-app-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ping-pong-app
+  template:
+    metadata:
+      labels:
+        app: ping-pong-app
+    spec:
+      containers:
+        - name: ping-pong-app
+          image: ramanan98/ping-pong-app@sha256:37c2607260f72f240f7dd2e72a0954bc9bcc5c3b359458a4cd6f2bfc27ac82d9
+          env:
+            - name: PORT
+              value: "8080"
