@@ -23,7 +23,7 @@ spec:
             - name: shared-image
               mountPath: /usr/src/app/files
         - name: image-read
-          image: ramanan98/image-read@sha256:0a8c1084e2e654ee1fd76111518e3baa89b78e28f85ec115c56e0062f38a659f
+          image: ramanan98/image-read@sha256:573eada4959add7c8ee2e73aaac69df77599295bb57b80c071e3bdd7ca0e70e0
           env:
             - name: PORT
               value: "8080"
