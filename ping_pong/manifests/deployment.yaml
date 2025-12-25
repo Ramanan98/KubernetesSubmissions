@@ -15,7 +15,17 @@ spec:
     spec:
       containers:
         - name: ping-pong-app
-          image: ramanan98/ping-pong@sha256:9191f3d3868b4a310eed96c2794e90a87968f598a0032c1ddf931e46a5b6afef
+          image: ramanan98/ping-pong@sha256:a05b8e8ead8a309639b1af308bf48e5cc6190613258a42189dec49e9bdf1f0e2
           env:
             - name: PORT
               value: "8080"
+            - name: POSTGRES_HOST
+              value: "postgres-svc"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: "postgres"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: ""
