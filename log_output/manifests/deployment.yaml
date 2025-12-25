@@ -12,20 +12,9 @@ spec:
       labels:
         app: log-output
     spec:
-      volumes:
-        - name: shared-logs
-          emptyDir: {}
       containers:
-        - name: log-read
-          image: ramanan98/log-read-app@sha256:76d9cd86a1a4a9df9239a7724c3cc685b05fa996f10a6f118d46fef2dfc8e707
+        - name: log-output
+          image: ramanan98/log-output@sha256:eb8a8400cf47190c78f23b1171b2cf50bb83fb37c06f4ac9bc71f43c65ac3eda
           env:
             - name: PORT
               value: "8080"
-          volumeMounts:
-            - name: shared-logs
-              mountPath: /usr/src/app/files
-        - name: log-write
-          image: ramanan98/log-write-app@sha256:a318d0c6a680b1b318b6e8cbefd10e4e08a8fd51945dd44da4760020304e2809
-          volumeMounts:
-            - name: shared-logs
-              mountPath: /usr/src/app/files

@@ -9,13 +9,15 @@ class Handler(BaseHTTPRequestHandler):
     counter = 0
 
     def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
-        response = f"pong {Handler.counter}"
-        self.wfile.write(response.encode())
-        Handler.counter += 1
-        with open("/usr/src/app/files/pingpongs.txt", "w") as f:
-            f.write(str(Handler.counter))
+        if self.path == "/pings":
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(str(Handler.counter).encode())
+        else:
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(f"pong {Handler.counter}".encode())
+            Handler.counter += 1
 
 
 HTTPServer(("", port), Handler).serve_forever()
