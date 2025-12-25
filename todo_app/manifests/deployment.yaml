@@ -12,9 +12,21 @@ spec:
       labels:
         app: todo-app
     spec:
+      volumes:
+        - name: shared-image
+          persistentVolumeClaim:
+            claimName: image-claim
       containers:
-        - name: todo-app
-          image: ramanan98/todo-app@sha256:f6c3bd94a73774f75cdba6e2c9cf11761a9c4e697d883241b94b27030e8d5950
+        - name: image-write
+          image: ramanan98/image-write@sha256:62913bf723e6e33d4d11af0cd05dda521d81f346d1668871a3eb56dfed05ac1e
+          volumeMounts:
+            - name: shared-image
+              mountPath: /usr/src/app/files
+        - name: image-read
+          image: ramanan98/image-read@sha256:0a8c1084e2e654ee1fd76111518e3baa89b78e28f85ec115c56e0062f38a659f
           env:
             - name: PORT
               value: "8080"
+          volumeMounts:
+            - name: shared-image
+              mountPath: /usr/src/app/files
