@@ -4,11 +4,11 @@ import http.client
 from urllib.parse import parse_qs
 import json
 
-PORT = int(os.environ.get("PORT", 8080))
-BACKEND_HOST = "todo-backend-svc"
-BACKEND_PORT = 2345
-IMAGE_PATH = "/usr/src/app/files/image.jpg"
-HTML_FILE = "/app/index.html"
+PORT = int(os.environ.get("IMAGE_READ_PORT", 8080))
+BACKEND_HOST = os.environ.get("BACKEND_HOST", "todo-backend-svc")
+BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 2345))
+IMAGE_PATH = os.environ.get("IMAGE_PATH", "/usr/src/app/files/image.jpg")
+HTML_FILE = os.environ.get("HTML_FILE", "/app/index.html")
 
 print(f"Server started on port {PORT}", flush=True)
 

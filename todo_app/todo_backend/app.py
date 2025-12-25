@@ -2,7 +2,7 @@ import os
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-port = int(os.environ.get("PORT", 8080))
+port = int(os.environ.get("TODO_BACKEND_PORT", 8080))
 print(f"Todo backend started on port {port}", flush=True)
 
 TODOS = []

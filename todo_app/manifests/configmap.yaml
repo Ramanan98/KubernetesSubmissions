@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: todo-app-configmap
+  namespace: project
+data:
+  IMAGE_READ_PORT: "8080"
+  BACKEND_HOST: "todo-backend-svc"
+  BACKEND_PORT: "2345"
+  IMAGE_PATH: "/usr/src/app/files/image.jpg"
+  HTML_FILE: "/app/index.html"
+
+  IMAGE_URL: "https://picsum.photos/1200"
+  IMAGE_WRITE_PATH: "/usr/src/app/files/image.jpg"
+  SLEEP_INTERVAL: "10"
+
+  TODO_BACKEND_PORT: "8080"

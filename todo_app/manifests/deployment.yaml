@@ -19,15 +19,54 @@ spec:
             claimName: image-claim
       containers:
         - name: image-write
-          image: ramanan98/image-write@sha256:62913bf723e6e33d4d11af0cd05dda521d81f346d1668871a3eb56dfed05ac1e
+          image: ramanan98/image-write@sha256:e09070ff84bac85d72c95858f56333eeb7d77e9e28742b5d753c00e5ecbb4934
+          env:
+            - name: IMAGE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-configmap
+                  key: IMAGE_URL
+            - name: IMAGE_WRITE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-configmap
+                  key: IMAGE_WRITE_PATH
+            - name: SLEEP_INTERVAL
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-configmap
+                  key: SLEEP_INTERVAL
           volumeMounts:
             - name: shared-image
               mountPath: /usr/src/app/files
         - name: image-read
-          image: ramanan98/image-read@sha256:65e6c021a260db09f4359e28d7bc422efd15407683061570a1de8147b7b9be97
+          image: ramanan98/image-read@sha256:e7ed637a12cc0eaeac3ca5a778b3ac68fc6c0595f57c25f742802fbf6393e3cf
           env:
-            - name: PORT
-              value: "8080"
+            - name: IMAGE_READ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-configmap
+                  key: IMAGE_READ_PORT
+            - name: BACKEND_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-configmap
+                  key: BACKEND_HOST
+            - name: BACKEND_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-configmap
+                  key: BACKEND_PORT
+            - name: IMAGE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-configmap
+                  key: IMAGE_PATH
+            - name: HTML_FILE
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-configmap
+                  key: HTML_FILE
           volumeMounts:
             - name: shared-image
               mountPath: /usr/src/app/files

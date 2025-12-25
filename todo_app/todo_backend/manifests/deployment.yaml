@@ -15,7 +15,10 @@ spec:
     spec:
       containers:
         - name: todo-backend
-          image: ramanan98/todo-backend@sha256:4aa611d437e901feba3707e0ee3f98c52d31075aff0fb52000038d0728edc5ca
+          image: ramanan98/todo-backend@sha256:e5b19050f9aca061e8c41307ac58558c1644511fa967684aedf92a53a0f81355
           env:
-            - name: PORT
-              value: "8080"
+            - name: TODO_BACKEND_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-app-configmap
+                  key: TODO_BACKEND_PORT
