@@ -15,7 +15,23 @@ spec:
     spec:
       containers:
         - name: log-output
-          image: ramanan98/log-output@sha256:eb8a8400cf47190c78f23b1171b2cf50bb83fb37c06f4ac9bc71f43c65ac3eda
+          image: ramanan98/log-output@sha256:c4f194fdb80f092473d9987a190e4c3b13b9bf31259892f09b4147f5b1ffec92
           env:
             - name: PORT
               value: "8080"
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: log-output-configmap
+                  key: MESSAGE
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: log-output-configmap
+            items:
+              - key: information.txt
+                path: information.txt
