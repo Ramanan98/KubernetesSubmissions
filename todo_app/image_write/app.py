@@ -1,5 +1,6 @@
-import requests
 import time
+
+import requests
 
 URL = "https://picsum.photos/1200"
 IMAGE_PATH = "/usr/src/app/files/image.jpg"

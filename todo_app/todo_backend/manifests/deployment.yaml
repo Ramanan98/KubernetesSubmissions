@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-backend-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-backend
+  template:
+    metadata:
+      labels:
+        app: todo-backend
+    spec:
+      containers:
+        - name: todo-backend
+          image: ramanan98/todo-backend@sha256:4aa611d437e901feba3707e0ee3f98c52d31075aff0fb52000038d0728edc5ca
+          env:
+            - name: PORT
+              value: "8080"

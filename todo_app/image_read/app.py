@@ -1,11 +1,16 @@
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import http.client
+from urllib.parse import parse_qs
+import json
 
-port = int(os.environ.get("PORT", 8080))
-print(f"Server started on port {port}", flush=True)
-
+PORT = int(os.environ.get("PORT", 8080))
+BACKEND_HOST = "todo-backend-svc"
+BACKEND_PORT = 2345
 IMAGE_PATH = "/usr/src/app/files/image.jpg"
 HTML_FILE = "/app/index.html"
+
+print(f"Server started on port {PORT}", flush=True)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -17,13 +22,53 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", "image/jpeg")
             self.end_headers()
             self.wfile.write(data)
+        elif self.path.startswith("/todos"):
+            conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT)
+            conn.request("GET", "/todos")
+            res = conn.getresponse()
+            todos = res.read().decode()
+            conn.close()
+            with open(HTML_FILE, "r") as f:
+                html_template = f.read()
+
+            html = html_template.replace("{{TODOS}}", todos_to_html(todos))
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html")
+            self.end_headers()
+            self.wfile.write(html.encode())
         else:
-            with open(HTML_FILE, "rb") as f:
-                html_data = f.read()
-                self.send_response(200)
-                self.send_header("Content-Type", "text/html")
-                self.end_headers()
-                self.wfile.write(html_data)
+            self.send_response(200)
+            with open(HTML_FILE, "r") as f:
+                html_template = f.read()
+            html = html_template.replace("{{TODOS}}", "")
+            self.send_header("Content-Type", "text/html")
+            self.end_headers()
+            self.wfile.write(html.encode())
+
+    def do_POST(self):
+        if self.path == "/todos":
+            content_length = int(self.headers.get("Content-Length", 0))
+            post_data = self.rfile.read(content_length).decode()
+            parsed = parse_qs(post_data)
+            todo_item = parsed.get("todo", [""])[0]
+            conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT)
+            conn.request("POST", "/todos", body=todo_item)
+            conn.getresponse()
+            conn.close()
+            self.send_response(303)
+            self.send_header("Location", "/todos")
+            self.end_headers()
+        else:
+            self.send_response(404)
+            self.end_headers()
 
 
-HTTPServer(("", port), Handler).serve_forever()
+def todos_to_html(todos_str):
+    try:
+        todos = json.loads(todos_str)
+    except Exception:
+        todos = []
+    return "".join(f"<li>{t}</li>" for t in todos)
+
+
+HTTPServer(("", PORT), Handler).serve_forever()
