@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres-stset
-  namespace: exercises
+  namespace: project
 spec:
   serviceName: postgres-svc
   replicas: 2
