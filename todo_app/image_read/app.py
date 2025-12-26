@@ -1,8 +1,8 @@
+import http.client
+import json
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import http.client
 from urllib.parse import parse_qs
-import json
 
 PORT = int(os.environ.get("IMAGE_READ_PORT", 8080))
 BACKEND_HOST = os.environ.get("BACKEND_HOST", "todo-backend-svc")

@@ -40,7 +40,7 @@ spec:
             - name: shared-image
               mountPath: /usr/src/app/files
         - name: image-read
-          image: ramanan98/image-read@sha256:e7ed637a12cc0eaeac3ca5a778b3ac68fc6c0595f57c25f742802fbf6393e3cf
+          image: ramanan98/image-read:latest
           env:
             - name: IMAGE_READ_PORT
               valueFrom:
