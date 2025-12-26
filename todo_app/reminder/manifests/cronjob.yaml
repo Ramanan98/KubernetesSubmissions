@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: reminder
+  namespace: project
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: reminder
+              image: ramanan98/reminder:latest
+              env:
+                - name: WIKI_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      name: todo-backend-configmap
+                      key: WIKI_URL
+          restartPolicy: OnFailure

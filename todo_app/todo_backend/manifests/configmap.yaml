@@ -10,3 +10,4 @@ data:
   POSTGRES_DB: "postgres"
   POSTGRES_USER: "postgres"
   POSTGRES_PASSWORD: ""
+  WIKI_URL: "https://en.wikipedia.org/wiki/Special:Random"
