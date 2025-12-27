@@ -35,11 +35,7 @@ class Handler(BaseHTTPRequestHandler):
     counter = 0
 
     def do_GET(self):
-        if self.path == "/pings":
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(str(Handler.counter).encode())
-        else:
+        if self.path == "/":
             self.send_response(200)
             self.end_headers()
             self.wfile.write(f"pong {Handler.counter}".encode())
@@ -47,6 +43,13 @@ class Handler(BaseHTTPRequestHandler):
             cur.execute(
                 "INSERT INTO ping_counter(counter) VALUES (%s)", (Handler.counter,)
             )
+        elif self.path == "/pings":
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(str(Handler.counter).encode())
+        else:
+            self.send_response(404)
+            self.end_headers()
 
 
 HTTPServer(("", port), Handler).serve_forever()
