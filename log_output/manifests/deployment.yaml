@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: log-output
-          image: ramanan98/log-output@sha256:c4f194fdb80f092473d9987a190e4c3b13b9bf31259892f09b4147f5b1ffec92
+          image: ramanan98/log-output:latest
           env:
             - name: PORT
               value: "8080"
