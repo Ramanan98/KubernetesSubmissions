@@ -15,12 +15,12 @@ spec:
     spec:
       containers:
         - name: ping-pong-app
-          image: ramanan98/ping-pong@sha256:a05b8e8ead8a309639b1af308bf48e5cc6190613258a42189dec49e9bdf1f0e2
+          image: ramanan98/ping-pong:latest
           env:
             - name: PORT
               value: "8080"
             - name: POSTGRES_HOST
-              value: "postgres-svc"
+              value: "postgres-svc.project.svc.cluster.local"
             - name: POSTGRES_PORT
               value: "5432"
             - name: POSTGRES_DB

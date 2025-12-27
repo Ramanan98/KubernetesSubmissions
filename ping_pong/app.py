@@ -2,7 +2,7 @@ import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import psycopg2
 
-DB_HOST = os.environ.get("POSTGRES_HOST", "postgres-svc")
+DB_HOST = os.environ.get("POSTGRES_HOST", "postgres-svc.project.svc.cluster.local")
 DB_PORT = int(os.environ.get("POSTGRES_PORT", 5432))
 DB_NAME = os.environ.get("POSTGRES_DB", "postgres")
 DB_USER = os.environ.get("POSTGRES_USER", "postgres")
