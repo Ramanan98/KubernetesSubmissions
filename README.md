@@ -39,3 +39,4 @@
 - [3.4](https://github.com/Ramanan98/KubernetesSubmissions/tree/3.4/ping_pong)
 - [3.5](https://github.com/Ramanan98/KubernetesSubmissions/tree/3.5/todo_app)
 - [3.6](https://github.com/Ramanan98/KubernetesSubmissions/tree/3.6)
+- [3.7](https://github.com/Ramanan98/KubernetesSubmissions/tree/3.7/.github/workflows)
