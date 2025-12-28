@@ -1,4 +1,4 @@
-name: Delete environment on branch deletion
+name: Delete namespace on branch deletion
 
 on:
   delete:
@@ -10,7 +10,6 @@ jobs:
       PROJECT_ID: ${{ secrets.GKE_PROJECT }}
       GKE_CLUSTER: dwk-cluster
       GKE_ZONE: europe-west4
-      NAMESPACE: ${{ github.ref_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,6 +29,14 @@ jobs:
           project_id: ${{ env.PROJECT_ID }}
           location: ${{ env.GKE_ZONE }}
 
-      - name: Delete Kubernetes namespace
+      - name: Delete Kubernetes namespace (safe)
         run: |
-          kubectl delete namespace $NAMESPACE --ignore-not-found
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          if [ -z "$BRANCH" ] || [ "$BRANCH" = "$GITHUB_REF" ]; then
+            BRANCH="${{ github.event.ref }}" || true
+            BRANCH="${BRANCH#refs/heads/}"
+          fi
+
+          echo "Namespace to delete: '$BRANCH'"
+
+          kubectl delete namespace "$BRANCH" --ignore-not-found
