@@ -23,7 +23,7 @@ jobs:
       IMAGE_READ_IMAGE: image-read
       TODO_APP_DEPLOYMENT: todo-app-dep
       TODO_BACKEND_DEPLOYMENT: todo-backend-dep
-      NAMESPACE: project
+      NAMESPACE: ${{ github.ref_name == 'main' && 'project' || github.ref_name }}
 
     steps:
       - name: Checkout
@@ -87,7 +87,8 @@ jobs:
           kustomize edit set image reminder-image=$REMINDER_TAG
           kustomize edit set image image-write-image=$WRITE_TAG
           kustomize edit set image image-read-image=$READ_TAG
-          kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment ${{ env.TODO_APP_DEPLOYMENT }} -n ${{ env.NAMESPACE }}
-          kubectl rollout status deployment ${{ env.TODO_BACKEND_DEPLOYMENT }} -n ${{ env.NAMESPACE }}
-          kubectl get services -n ${{ env.NAMESPACE }} -o wide
+          kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+          kustomize build . | kubectl apply -n $NAMESPACE -f -
+          kubectl rollout status deployment $TODO_APP_DEPLOYMENT -n $NAMESPACE
+          kubectl rollout status deployment $TODO_BACKEND_DEPLOYMENT -n $NAMESPACE
+          kubectl get services -n $NAMESPACE -o wide
