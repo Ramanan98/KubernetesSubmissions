@@ -1,9 +1,7 @@
 name: Delete environment on branch deletion
 
 on:
-  push:
-    branches:
-      - "**"
+  delete:
 
 jobs:
   delete-namespace:
