@@ -29,14 +29,8 @@ jobs:
           project_id: ${{ env.PROJECT_ID }}
           location: ${{ env.GKE_ZONE }}
 
-      - name: Delete Kubernetes namespace (safe)
+      - name: Delete Kubernetes namespace
         run: |
-          BRANCH="${GITHUB_REF#refs/heads/}"
-          if [ -z "$BRANCH" ] || [ "$BRANCH" = "$GITHUB_REF" ]; then
-            BRANCH="${{ github.event.ref }}" || true
-            BRANCH="${BRANCH#refs/heads/}"
-          fi
-
-          echo "Namespace to delete: '$BRANCH'"
-
-          kubectl delete namespace "$BRANCH" --ignore-not-found
+          NAMESPACE="${GITHUB_REF}"
+          echo "Namespace to delete: '$NAMESPACE'"
+          kubectl delete namespace "$NAMESPACE" --ignore-not-found
