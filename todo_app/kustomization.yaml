@@ -7,6 +7,7 @@ resources:
   - todo_backend/manifests/deployment.yaml
   - todo_backend/manifests/service.yaml
   - reminder/manifests/cronjob.yaml
+  - manifests/backup-cronjob.yaml
   - manifests/configmap.yaml
   - manifests/persistentvolumeclaim.yaml
   - manifests/deployment.yaml

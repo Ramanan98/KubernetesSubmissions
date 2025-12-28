@@ -1,0 +1,63 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: gcs-backup-postgres
+spec:
+  schedule: "0 0 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: pg-backup
+              image: postgres:18
+              env:
+                - name: GCS_BUCKET
+                  value: todo-db-backup
+                - name: PGHOST
+                  value: postgres-svc
+                - name: PGPORT
+                  value: "5432"
+                - name: PGUSER
+                  value: postgres
+                - name: PGPASSWORD
+                  value: ""
+                - name: PGDATABASE
+                  value: postgres
+              volumeMounts:
+                - name: gcs-key
+                  mountPath: /var/secrets/google
+                  readOnly: true
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e
+
+                  echo "Installing Google Cloud SDK..."
+                  mkdir -p /usr/share/keyrings
+                  curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+                  echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" \
+                    > /etc/apt/sources.list.d/google-cloud-sdk.list
+                  apt-get update && apt-get install -y google-cloud-sdk
+                  rm -rf /var/lib/apt/lists/*
+
+                  TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+                  DUMP_FILE="/tmp/postgres-backup-${TIMESTAMP}.dump"
+
+                  echo "Creating Postgres backup..."
+                  pg_dump "postgresql://$PGUSER:$PGPASSWORD@$PGHOST:$PGPORT/$PGDATABASE" -F c -f "$DUMP_FILE"
+
+                  echo "Authenticating service account..."
+                  gcloud auth activate-service-account --key-file=/var/secrets/google/key.json
+
+                  echo "Uploading backup to GCS..."
+                  gsutil cp "$DUMP_FILE" "gs://${GCS_BUCKET}/postgres-backup-${TIMESTAMP}.dump"
+
+                  echo "Backup completed successfully"
+          volumes:
+            - name: gcs-key
+              secret:
+                secretName: gcs-key
