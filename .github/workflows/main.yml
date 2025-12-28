@@ -82,7 +82,8 @@ jobs:
 
       - name: Deploy
         run: |
-          cd todo_app
+          echo "Current directory: "
+          pwd
           kustomize edit set image backend-image=$BACKEND_TAG
           kustomize edit set image reminder-image=$REMINDER_TAG
           kustomize edit set image image-write-image=$WRITE_TAG
