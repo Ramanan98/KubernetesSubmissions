@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS todos (
 )
 
 port = int(os.environ.get("TODO_BACKEND_PORT", 8080))
+logger.info("Built in GitHub actions and pushed to Artifact Registry")
 logger.info(f"Todo backend started on port {port}")
 
 

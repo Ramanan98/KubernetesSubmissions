@@ -1,0 +1,92 @@
+name: Release application
+
+on:
+  push:
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-west4
+  REGISTRY: europe-west4-docker.pkg.dev
+  REPOSITORY: my-repository
+  BRANCH: ${{ github.ref_name }}
+
+jobs:
+  build-publish-deploy:
+    name: Build, Publish and Deploy
+    runs-on: ubuntu-latest
+
+    env:
+      TODO_BACKEND_IMAGE: todo-backend
+      REMINDER_IMAGE: reminder
+      IMAGE_WRITE_IMAGE: image-write
+      IMAGE_READ_IMAGE: image-read
+      TODO_APP_DEPLOYMENT: todo-app-dep
+      TODO_BACKEND_DEPLOYMENT: todo-backend-dep
+      NAMESPACE: project
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: "${{ secrets.GKE_SA_KEY }}"
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Use gcloud CLI
+        run: gcloud info
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: "${{ env.GKE_CLUSTER }}"
+          project_id: "${{ env.PROJECT_ID }}"
+          location: "${{ env.GKE_ZONE }}"
+
+      - name: Set up Docker Buildx
+        run: gcloud auth configure-docker "$REGISTRY"
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2.1.0
+
+      - name: Build & push todo-backend
+        run: |
+          BACKEND_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/${{ env.TODO_BACKEND_IMAGE }}:$BRANCH-$GITHUB_SHA
+          docker build -t $BACKEND_TAG ./todo_app/todo_backend
+          docker push $BACKEND_TAG
+          echo "BACKEND_TAG=$BACKEND_TAG" >> $GITHUB_ENV
+
+      - name: Build & push reminder
+        run: |
+          REMINDER_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/${{ env.REMINDER_IMAGE }}:$BRANCH-$GITHUB_SHA
+          docker build -t $REMINDER_TAG ./todo_app/reminder
+          docker push $REMINDER_TAG
+          echo "REMINDER_TAG=$REMINDER_TAG" >> $GITHUB_ENV
+
+      - name: Build & push image-write
+        run: |
+          WRITE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/${{ env.IMAGE_WRITE_IMAGE }}:$BRANCH-$GITHUB_SHA
+          docker build -t $WRITE_TAG ./todo_app/image_write
+          docker push $WRITE_TAG
+          echo "WRITE_TAG=$WRITE_TAG" >> $GITHUB_ENV
+
+      - name: Build & push image-read
+        run: |
+          READ_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/${{ env.IMAGE_READ_IMAGE }}:$BRANCH-$GITHUB_SHA
+          docker build -t $READ_TAG ./todo_app/image_read
+          docker push $READ_TAG
+          echo "READ_TAG=$READ_TAG" >> $GITHUB_ENV
+
+      - name: Deploy
+        run: |
+          kustomize edit set image backend-image=$BACKEND_TAG
+          kustomize edit set image reminder-image=$REMINDER_TAG
+          kustomize edit set image image-write-image=$WRITE_TAG
+          kustomize edit set image image-read-image=$READ_TAG
+          kustomize build todo_app/ | kubectl apply -f -
+          kubectl rollout status deployment ${{ env.TODO_APP_DEPLOYMENT }} -n ${{ env.NAMESPACE }}
+          kubectl rollout status deployment ${{ env.TODO_BACKEND_DEPLOYMENT }} -n ${{ env.NAMESPACE }}
+          kubectl get services -n ${{ env.NAMESPACE }} -o wide

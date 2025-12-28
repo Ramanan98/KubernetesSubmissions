@@ -11,6 +11,7 @@ IMAGE_PATH = os.environ.get("IMAGE_PATH", "/usr/src/app/files/image.jpg")
 HTML_FILE = os.environ.get("HTML_FILE", "/app/index.html")
 
 print(f"Server started on port {PORT}", flush=True)
+print("Built in GitHub actions and pushed to Artifact Registry", flush=True)
 
 
 class Handler(BaseHTTPRequestHandler):

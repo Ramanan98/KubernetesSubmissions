@@ -29,6 +29,7 @@ def main():
     conn.autocommit = True
     cur = conn.cursor()
 
+    print("Built in GitHub actions and pushed to Artifact Registry", flush=True)
     print("Connected to Postgres", flush=True)
 
     cur.execute(
