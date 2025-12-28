@@ -1,7 +1,15 @@
+import logging
 import os
+import sys
 
 import psycopg2
 import requests
+
+logger = logging.getLogger("reminder")
+logger.setLevel(logging.INFO)
+stdout_handler = logging.StreamHandler(sys.stdout)
+stdout_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+logger.addHandler(stdout_handler)
 
 DB_HOST = os.environ.get("POSTGRES_HOST", "postgres-svc")
 DB_PORT = int(os.environ.get("POSTGRES_PORT", 5432))
@@ -29,8 +37,8 @@ def main():
     conn.autocommit = True
     cur = conn.cursor()
 
-    print("Built in GitHub actions and pushed to Artifact Registry", flush=True)
-    print("Connected to Postgres", flush=True)
+    logger.info("Built in GitHub actions and pushed to Artifact Registry")
+    logger.info("Connected to Postgres")
 
     cur.execute(
         """

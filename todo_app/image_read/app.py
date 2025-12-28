@@ -1,8 +1,16 @@
 import http.client
 import json
+import logging
 import os
+import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import parse_qs
+
+logger = logging.getLogger("image-read")
+logger.setLevel(logging.INFO)
+stdout_handler = logging.StreamHandler(sys.stdout)
+stdout_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+logger.addHandler(stdout_handler)
 
 PORT = int(os.environ.get("IMAGE_READ_PORT", 8080))
 BACKEND_HOST = os.environ.get("BACKEND_HOST", "todo-backend-svc")
@@ -10,8 +18,7 @@ BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 2345))
 IMAGE_PATH = os.environ.get("IMAGE_PATH", "/usr/src/app/files/image.jpg")
 HTML_FILE = os.environ.get("HTML_FILE", "/app/index.html")
 
-print(f"Server started on port {PORT}", flush=True)
-print("Built in GitHub actions and pushed to Artifact Registry", flush=True)
+logger.info(f"Server started on port {PORT}")
 
 
 class Handler(BaseHTTPRequestHandler):
