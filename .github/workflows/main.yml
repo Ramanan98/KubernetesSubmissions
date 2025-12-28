@@ -82,13 +82,12 @@ jobs:
 
       - name: Deploy
         run: |
-          echo "Current directory: "
-          pwd
+          cd todo_app
           kustomize edit set image backend-image=$BACKEND_TAG
           kustomize edit set image reminder-image=$REMINDER_TAG
           kustomize edit set image image-write-image=$WRITE_TAG
           kustomize edit set image image-read-image=$READ_TAG
-          kustomize build todo_app/ | kubectl apply -f -
+          kustomize build . | kubectl apply -f -
           kubectl rollout status deployment ${{ env.TODO_APP_DEPLOYMENT }} -n ${{ env.NAMESPACE }}
           kubectl rollout status deployment ${{ env.TODO_BACKEND_DEPLOYMENT }} -n ${{ env.NAMESPACE }}
           kubectl get services -n ${{ env.NAMESPACE }} -o wide
