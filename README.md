@@ -41,3 +41,6 @@
 - [3.6](https://github.com/Ramanan98/KubernetesSubmissions/tree/3.6)
 - [3.7](https://github.com/Ramanan98/KubernetesSubmissions/tree/3.7/.github/workflows)
 - [3.8](https://github.com/Ramanan98/KubernetesSubmissions/tree/3.8/.github/workflows/delete.yml)
+- [3.9](https://github.com/Ramanan98/KubernetesSubmissions/tree/3.9/README.md)
+
+  A DBaaS solution provides automated backups, easier maintenance, built-in high availability, and simpler connectivity for applications that may not run inside the cluster, as well as additional features offered by the cloud provider. However, this benefit comes at a higher cost. In contrast, running PostgreSQL using a container image inside the cluster can be more cost-effective and offers greater control over configuration, but it also requires manual handling of backups, upgrades, and failure recovery. Backing up requires setting up manual jobs and other services like object storage. This requires expertise from the developer. Accessing the database from outside the cluster can be more complex in this setup, and operational responsibility is higher. If the availability requirements of the application are not high and there are no specific SLAs tied to it, going with the DIY option is better, otherwise, DBaaS is the best solution.
