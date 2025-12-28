@@ -4,7 +4,6 @@ metadata:
   name: image-claim
   namespace: project
 spec:
-  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:

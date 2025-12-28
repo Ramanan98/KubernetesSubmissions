@@ -19,7 +19,7 @@ spec:
             claimName: image-claim
       containers:
         - name: image-write
-          image: ramanan98/image-write@sha256:e09070ff84bac85d72c95858f56333eeb7d77e9e28742b5d753c00e5ecbb4934
+          image: image-write-image
           env:
             - name: IMAGE_URL
               valueFrom:
@@ -40,7 +40,7 @@ spec:
             - name: shared-image
               mountPath: /usr/src/app/files
         - name: image-read
-          image: ramanan98/image-read:latest
+          image: image-read-image
           env:
             - name: IMAGE_READ_PORT
               valueFrom:

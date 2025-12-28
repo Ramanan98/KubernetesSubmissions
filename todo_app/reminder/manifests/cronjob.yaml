@@ -11,7 +11,7 @@ spec:
         spec:
           containers:
             - name: reminder
-              image: ramanan98/reminder:latest
+              image: reminder-image
               env:
                 - name: WIKI_URL
                   valueFrom:

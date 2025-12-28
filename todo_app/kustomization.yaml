@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - todo_backend/manifests/configmap.yaml
+  - todo_backend/manifests/deployment.yaml
+  - todo_backend/manifests/service.yaml
+  - reminder/manifests/cronjob.yaml
+  - manifests/configmap.yaml
+  - manifests/persistentvolumeclaim.yaml
+  - manifests/deployment.yaml
+  - manifests/service.yaml
+  - manifests/gateway.yaml
+  - manifests/route.yaml
+images:
+  - name: backend-image
+    newName: ramanan98/todo-backend
+    newTag: latest
+  - name: reminder-image
+    newName: ramanan98/reminder
+    newTag: latest
+  - name: image-write-image
+    newName: ramanan98/image-write
+    newTag: latest
+  - name: image-read-image
+    newName: ramanan98/image-read
+    newTag: latest
