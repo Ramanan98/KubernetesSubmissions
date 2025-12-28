@@ -1,0 +1,38 @@
+name: Delete environment on branch deletion
+
+on:
+  push:
+    branches-ignore:
+      - "**"
+
+jobs:
+  delete-namespace:
+    if: ${{ github.event.deleted == true && github.event.ref_type == 'branch' }}
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+      GKE_CLUSTER: dwk-cluster
+      GKE_ZONE: europe-west4
+      NAMESPACE: ${{ github.ref_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: "${{ secrets.GKE_SA_KEY }}"
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          project_id: ${{ env.PROJECT_ID }}
+          location: ${{ env.GKE_ZONE }}
+
+      - name: Delete Kubernetes namespace
+        run: |
+          kubectl delete namespace $NAMESPACE --ignore-not-found
