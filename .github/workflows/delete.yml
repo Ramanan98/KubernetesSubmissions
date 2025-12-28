@@ -31,6 +31,6 @@ jobs:
 
       - name: Delete Kubernetes namespace
         run: |
-          NAMESPACE="${GITHUB_REF}"
+          NAMESPACE=$(jq -r .ref $GITHUB_EVENT_PATH)
           echo "Namespace to delete: '$NAMESPACE'"
           kubectl delete namespace "$NAMESPACE" --ignore-not-found
