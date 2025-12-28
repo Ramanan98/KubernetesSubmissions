@@ -19,6 +19,13 @@ spec:
       containers:
         - name: image-write
           image: image-write-image
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "150m"
+              memory: "128Mi"
           env:
             - name: IMAGE_URL
               valueFrom:
@@ -40,6 +47,13 @@ spec:
               mountPath: /usr/src/app/files
         - name: image-read
           image: image-read-image
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
           env:
             - name: IMAGE_READ_PORT
               valueFrom:

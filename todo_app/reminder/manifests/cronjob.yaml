@@ -11,6 +11,13 @@ spec:
           containers:
             - name: reminder
               image: reminder-image
+              resources:
+                requests:
+                  cpu: "50m"
+                  memory: "64Mi"
+                limits:
+                  cpu: "100m"
+                  memory: "128Mi"
               env:
                 - name: WIKI_URL
                   valueFrom:
