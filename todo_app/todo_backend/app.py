@@ -18,26 +18,38 @@ DB_NAME = os.environ.get("POSTGRES_DB", "postgres")
 DB_USER = os.environ.get("POSTGRES_USER", "postgres")
 DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "")
 
-conn = psycopg2.connect(
-    host=DB_HOST,
-    port=DB_PORT,
-    database=DB_NAME,
-    user=DB_USER,
-    password=DB_PASSWORD,
-)
-conn.autocommit = True
-cur = conn.cursor()
+conn = None
+cur = None
 
-logger.info("Connected to Postgres")
 
-cur.execute(
-    """
-CREATE TABLE IF NOT EXISTS todos (
-    id SERIAL PRIMARY KEY,
-    item TEXT
-)
-"""
-)
+def connect_db():
+    global conn, cur
+    try:
+        conn = psycopg2.connect(
+            host=DB_HOST,
+            port=DB_PORT,
+            database=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+        )
+        conn.autocommit = True
+        cur = conn.cursor()
+        cur.execute(
+            """
+        CREATE TABLE IF NOT EXISTS todos (
+            id SERIAL PRIMARY KEY,
+            item TEXT
+        )
+        """
+        )
+        logger.info("Connected to Postgres")
+    except Exception as e:
+        conn = None
+        cur = None
+        logger.error(f"DB connection failed: {e}")
+
+
+connect_db()
 
 port = int(os.environ.get("TODO_BACKEND_PORT", 8080))
 logger.info("Built in GitHub actions and pushed to Artifact Registry")
@@ -60,8 +72,13 @@ class Handler(BaseHTTPRequestHandler):
             logger.info({"method": "GET", "path": self.path, "response": todos})
         elif self.path == "/healthz":
             try:
-                cur.execute("SELECT 1")
-                self.send_response(200)
+                if cur is None:
+                    connect_db()
+                if cur is not None:
+                    cur.execute("SELECT 1")
+                    self.send_response(200)
+                else:
+                    self.send_response(500)
             except Exception:
                 self.send_response(500)
             self.end_headers()
