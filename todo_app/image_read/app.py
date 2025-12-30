@@ -1,10 +1,8 @@
 import http.client
-import json
 import logging
 import os
 import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import parse_qs
 
 logger = logging.getLogger("image-read")
 logger.setLevel(logging.INFO)
@@ -24,100 +22,109 @@ logger.info(f"Server started on port {PORT}")
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/image.jpg":
-            with open(IMAGE_PATH, "rb") as f:
-                data = f.read()
-            self.send_response(200)
-            self.send_header("Content-Type", "image/jpeg")
-            self.end_headers()
-            self.wfile.write(data)
-        elif self.path.startswith("/todos"):
             try:
-                conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT, timeout=2)
-                conn.request("GET", "/todos")
-                res = conn.getresponse()
-                todos = res.read().decode()
-                conn.close()
-            except Exception:
-                self.send_response(500)
+                with open(IMAGE_PATH, "rb") as f:
+                    data = f.read()
+                self.send_response(200)
+                self.send_header("Content-Type", "image/jpeg")
                 self.end_headers()
-                return
+                self.wfile.write(data)
+                logger.info("Served image.jpg")
+            except Exception as e:
+                logger.error(f"Error serving image: {e}")
+                self.send_response(404)
+                self.end_headers()
 
-            with open(HTML_FILE, "r") as f:
-                html_template = f.read()
-            active_html, done_html = todos_to_html(todos)
-            html = html_template.replace("{{TODOS}}", active_html).replace(
-                "{{DONE_TODOS}}", done_html
-            )
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html")
-            self.end_headers()
-            self.wfile.write(html.encode())
-        elif self.path.startswith("/todos/"):
+        elif self.path == "/api/todos":
             try:
-                todo_id = self.path.split("/")[-1]
                 conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT, timeout=2)
-                conn.request("PUT", f"/todos/{todo_id}")
-                res = conn.getresponse()
-                conn.close()
-                self.send_response(303)
-                self.send_header("Location", "/todos")
-                self.end_headers()
-            except Exception:
-                self.send_response(500)
-                self.end_headers()
-        elif self.path == "/healthz":
-            try:
-                conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT)
                 conn.request("GET", "/todos")
                 res = conn.getresponse()
+                todos = res.read()
                 conn.close()
-                self.send_response(200 if res.status == 200 else 500)
-            except Exception:
+
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(todos)
+                logger.info("Proxied GET /api/todos to backend")
+            except Exception as e:
+                logger.error(f"Backend error: {e}")
                 self.send_response(500)
-            self.end_headers()
-        else:
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b'{"error": "Backend unavailable"}')
+
+        elif self.path == "/" or self.path == "/todos":
+            try:
+                with open(HTML_FILE, "r") as f:
+                    html = f.read()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html")
+                self.end_headers()
+                self.wfile.write(html.encode())
+                logger.info(f"Served index.html for {self.path}")
+            except Exception as e:
+                logger.error(f"Error serving HTML: {e}")
+                self.send_response(500)
+                self.end_headers()
+
+        elif self.path == "/healthz":
             self.send_response(200)
-            with open(HTML_FILE, "r") as f:
-                html_template = f.read()
-            html = html_template.replace("{{TODOS}}", "")
-            self.send_header("Content-Type", "text/html")
             self.end_headers()
-            self.wfile.write(html.encode())
+
+        else:
+            self.send_response(404)
+            self.end_headers()
+            logger.info(f"404 for path: {self.path}")
 
     def do_POST(self):
-        if self.path == "/todos":
-            content_length = int(self.headers.get("Content-Length", 0))
-            post_data = self.rfile.read(content_length).decode()
-            parsed = parse_qs(post_data)
-            todo_item = parsed.get("todo", [""])[0]
-            conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT)
-            conn.request("POST", "/todos", body=todo_item)
-            conn.getresponse()
-            conn.close()
-            self.send_response(303)
-            self.send_header("Location", "/todos")
-            self.end_headers()
+        if self.path == "/api/todos":
+            try:
+                content_length = int(self.headers.get("Content-Length", 0))
+                todo_item = self.rfile.read(content_length).decode().strip()
+
+                conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT, timeout=2)
+                conn.request("POST", "/todos", body=todo_item)
+                res = conn.getresponse()
+                response_data = res.read()
+                conn.close()
+
+                self.send_response(res.status)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(response_data)
+                logger.info(f"Proxied POST /api/todos to backend: {todo_item}")
+            except Exception as e:
+                logger.error(f"Backend error on POST: {e}")
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b'{"error": "Backend unavailable"}')
         else:
             self.send_response(404)
             self.end_headers()
 
+    def do_PUT(self):
+        if self.path.startswith("/api/todos/"):
+            try:
+                todo_id = self.path.split("/")[-1]
 
-def todos_to_html(todos_str):
-    try:
-        todos = json.loads(todos_str)
-    except Exception:
-        todos = []
+                conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT, timeout=2)
+                conn.request("PUT", f"/todos/{todo_id}")
+                res = conn.getresponse()
+                conn.close()
 
-    active_todos = [t for t in todos if not t.get("done", False)]
-    done_todos = [t for t in todos if t.get("done", False)]
-
-    active_html = "".join(
-        f'<li>{t["item"]} <button onclick="markDone({t["id"]})">Mark as done</button></li>'
-        for t in active_todos
-    )
-    done_html = "".join(f'<li>{t["item"]}</li>' for t in done_todos)
-
-    return active_html, done_html
+                self.send_response(res.status)
+                self.end_headers()
+                logger.info(f"Proxied PUT /api/todos/{todo_id} to backend")
+            except Exception as e:
+                logger.error(f"Backend error on PUT: {e}")
+                self.send_response(500)
+                self.end_headers()
+        else:
+            self.send_response(404)
+            self.end_headers()
 
 
 HTTPServer(("", PORT), Handler).serve_forever()
