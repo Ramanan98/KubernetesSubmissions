@@ -56,3 +56,5 @@
 - [4.3](https://github.com/Ramanan98/KubernetesSubmissions/tree/4.3/README.md)
 
   `count(kube_pod_info{namespace='prometheus', created_by_kind='StatefulSet'})`
+
+- [4.4](https://github.com/Ramanan98/KubernetesSubmissions/tree/4.4/ping_pong/manifests)
