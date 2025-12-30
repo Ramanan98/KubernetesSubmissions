@@ -38,9 +38,13 @@ def connect_db():
             """
         CREATE TABLE IF NOT EXISTS todos (
             id SERIAL PRIMARY KEY,
-            item TEXT
+            item TEXT,
+            done BOOLEAN DEFAULT FALSE
         )
         """
+        )
+        cur.execute(
+            "ALTER TABLE todos ADD COLUMN IF NOT EXISTS done BOOLEAN DEFAULT FALSE"
         )
         logger.info("Connected to Postgres")
     except Exception as e:
@@ -61,9 +65,9 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/todos":
-            cur.execute("SELECT item FROM todos")
+            cur.execute("SELECT id, item, done FROM todos")
             rows = cur.fetchall()
-            todos = [row[0] for row in rows]
+            todos = [{"id": row[0], "item": row[1], "done": row[2]} for row in rows]
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
@@ -120,6 +124,29 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
             logger.info({"method": "POST", "path": self.path, "response": 404})
+
+    def do_PUT(self):
+        if self.path.startswith("/todos/"):
+            try:
+                todo_id = int(self.path.split("/")[-1])
+            except ValueError:
+                self.send_response(400)
+                self.end_headers()
+                return
+
+            cur.execute("UPDATE todos SET done = TRUE WHERE id = %s", (todo_id,))
+            if cur.rowcount == 0:
+                self.send_response(404)
+                self.end_headers()
+                logger.info({"method": "PUT", "path": self.path, "response": 404})
+            else:
+                self.send_response(200)
+                self.end_headers()
+                logger.info({"method": "PUT", "path": self.path, "todo_id": todo_id})
+        else:
+            self.send_response(404)
+            self.end_headers()
+            logger.info({"method": "PUT", "path": self.path, "response": 404})
 
 
 HTTPServer(("", port), Handler).serve_forever()

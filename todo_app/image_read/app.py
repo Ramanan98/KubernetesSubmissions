@@ -49,6 +49,19 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", "text/html")
             self.end_headers()
             self.wfile.write(html.encode())
+        elif self.path.startswith("/todos/"):
+            try:
+                todo_id = self.path.split("/")[-1]
+                conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT, timeout=2)
+                conn.request("PUT", f"/todos/{todo_id}")
+                res = conn.getresponse()
+                conn.close()
+                self.send_response(303)
+                self.send_header("Location", "/todos")
+                self.end_headers()
+            except Exception:
+                self.send_response(500)
+                self.end_headers()
         elif self.path == "/healthz":
             try:
                 conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT)
@@ -91,7 +104,22 @@ def todos_to_html(todos_str):
         todos = json.loads(todos_str)
     except Exception:
         todos = []
-    return "".join(f"<li>{t}</li>" for t in todos)
+
+    active_todos = [t for t in todos if not t.get("done", False)]
+    done_todos = [t for t in todos if t.get("done", False)]
+
+    result = ""
+    if active_todos:
+        active_html = "".join(
+            f'<li>{t["item"]} <button onclick="markDone({t["id"]})">Mark as done</button></li>'
+            for t in active_todos
+        )
+        result += f"<ul>{active_html}</ul>"
+    if done_todos:
+        done_html = "".join(f'<li>{t["item"]}</li>' for t in done_todos)
+        result += f"<h1>Done</h1><ul>{done_html}</ul>"
+
+    return result
 
 
 HTTPServer(("", PORT), Handler).serve_forever()

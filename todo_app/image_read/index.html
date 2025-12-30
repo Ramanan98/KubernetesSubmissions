@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <title>The Project App</title>
+    <script>
+      function markDone(id) {
+        fetch(`/todos/${id}`, { method: 'PUT' })
+          .then(() => window.location.reload())
+          .catch(err => console.error('Error:', err));
+      }
+    </script>
   </head>
   <body>
     <h1>The project app</h1>
@@ -12,11 +19,7 @@
       <input type="text" name="todo" placeholder="Enter todo" />
       <button type="submit">Create todo</button>
     </form>
-
-    <ul>
-      {{TODOS}}
-    </ul>
-
+    {{TODOS}}
     <p>DevOps with Kubernetes 2025</p>
   </body>
 </html>
