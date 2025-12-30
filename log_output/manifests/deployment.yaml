@@ -16,6 +16,13 @@ spec:
       containers:
         - name: log-output
           image: ramanan98/log-output:latest
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+            httpGet:
+              path: /healthz
+              port: 8080
           env:
             - name: PORT
               value: "8080"
