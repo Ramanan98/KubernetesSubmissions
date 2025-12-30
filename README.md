@@ -53,3 +53,6 @@
 
 - [4.1](https://github.com/Ramanan98/KubernetesSubmissions/tree/4.1/ping_pong)
 - [4.2](https://github.com/Ramanan98/KubernetesSubmissions/tree/4.2/todo_app)
+- [4.3](https://github.com/Ramanan98/KubernetesSubmissions/tree/4.3/README.md)
+
+  `count(kube_pod_info{namespace='prometheus', created_by_kind='StatefulSet'})`
