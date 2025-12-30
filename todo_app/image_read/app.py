@@ -31,19 +31,34 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
         elif self.path.startswith("/todos"):
-            conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT)
-            conn.request("GET", "/todos")
-            res = conn.getresponse()
-            todos = res.read().decode()
-            conn.close()
+            try:
+                conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT, timeout=2)
+                conn.request("GET", "/todos")
+                res = conn.getresponse()
+                todos = res.read().decode()
+                conn.close()
+            except Exception:
+                self.send_response(500)
+                self.end_headers()
+                return
+
             with open(HTML_FILE, "r") as f:
                 html_template = f.read()
-
             html = html_template.replace("{{TODOS}}", todos_to_html(todos))
             self.send_response(200)
             self.send_header("Content-Type", "text/html")
             self.end_headers()
             self.wfile.write(html.encode())
+        elif self.path == "/healthz":
+            try:
+                conn = http.client.HTTPConnection(BACKEND_HOST, BACKEND_PORT)
+                conn.request("GET", "/todos")
+                res = conn.getresponse()
+                conn.close()
+                self.send_response(200 if res.status == 200 else 500)
+            except Exception:
+                self.send_response(500)
+            self.end_headers()
         else:
             self.send_response(200)
             with open(HTML_FILE, "r") as f:

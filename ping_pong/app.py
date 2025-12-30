@@ -1,5 +1,6 @@
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
+
 import psycopg2
 
 DB_HOST = os.environ.get("POSTGRES_HOST", "postgres-svc.project.svc.cluster.local")

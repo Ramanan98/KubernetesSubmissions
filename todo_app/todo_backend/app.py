@@ -58,6 +58,13 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(todos).encode())
 
             logger.info({"method": "GET", "path": self.path, "response": todos})
+        elif self.path == "/healthz":
+            try:
+                cur.execute("SELECT 1")
+                self.send_response(200)
+            except Exception:
+                self.send_response(500)
+            self.end_headers()
         else:
             self.send_response(404)
             self.end_headers()
