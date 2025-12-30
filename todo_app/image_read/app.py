@@ -44,7 +44,10 @@ class Handler(BaseHTTPRequestHandler):
 
             with open(HTML_FILE, "r") as f:
                 html_template = f.read()
-            html = html_template.replace("{{TODOS}}", todos_to_html(todos))
+            active_html, done_html = todos_to_html(todos)
+            html = html_template.replace("{{TODOS}}", active_html).replace(
+                "{{DONE_TODOS}}", done_html
+            )
             self.send_response(200)
             self.send_header("Content-Type", "text/html")
             self.end_headers()
@@ -108,18 +111,13 @@ def todos_to_html(todos_str):
     active_todos = [t for t in todos if not t.get("done", False)]
     done_todos = [t for t in todos if t.get("done", False)]
 
-    result = ""
-    if active_todos:
-        active_html = "".join(
-            f'<li>{t["item"]} <button onclick="markDone({t["id"]})">Mark as done</button></li>'
-            for t in active_todos
-        )
-        result += f"<ul>{active_html}</ul>"
-    if done_todos:
-        done_html = "".join(f'<li>{t["item"]}</li>' for t in done_todos)
-        result += f"<h1>Done</h1><ul>{done_html}</ul>"
+    active_html = "".join(
+        f'<li>{t["item"]} <button onclick="markDone({t["id"]})">Mark as done</button></li>'
+        for t in active_todos
+    )
+    done_html = "".join(f'<li>{t["item"]}</li>' for t in done_todos)
 
-    return result
+    return active_html, done_html
 
 
 HTTPServer(("", PORT), Handler).serve_forever()

@@ -5,9 +5,9 @@
     <title>The Project App</title>
     <script>
       function markDone(id) {
-        fetch(`/todos/${id}`, { method: 'PUT' })
+        fetch(`/todos/${id}`, { method: "PUT" })
           .then(() => window.location.reload())
-          .catch(err => console.error('Error:', err));
+          .catch((err) => console.error("Error:", err));
       }
     </script>
   </head>
@@ -19,7 +19,10 @@
       <input type="text" name="todo" placeholder="Enter todo" />
       <button type="submit">Create todo</button>
     </form>
-    {{TODOS}}
+    <h1>Todo</h1>
+    <ul></ul>{{TODOS}}</ul>
+    <h1>Done</h1>
+    <ul>{{DONE_TODOS}}</ul>
     <p>DevOps with Kubernetes 2025</p>
   </body>
 </html>
