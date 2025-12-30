@@ -12,9 +12,9 @@ stdout_handler = logging.StreamHandler(sys.stdout)
 stdout_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
 logger.addHandler(stdout_handler)
 
-PORT = int(os.environ.get("IMAGE_READ_PORT", 8080))
+PORT = int(os.environ.get("IMAGE_READ_PORT", 8081))
 BACKEND_HOST = os.environ.get("BACKEND_HOST", "todo-backend-svc")
-BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 2345))
+BACKEND_PORT = int(os.environ.get("BACKEND_PORT", 8080))
 IMAGE_PATH = os.environ.get("IMAGE_PATH", "/usr/src/app/files/image.jpg")
 HTML_FILE = os.environ.get("HTML_FILE", "/app/index.html")
 
