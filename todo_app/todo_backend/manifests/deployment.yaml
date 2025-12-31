@@ -67,3 +67,8 @@ spec:
                 configMapKeyRef:
                   name: todo-backend-configmap
                   key: POSTGRES_PASSWORD
+            - name: NATS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: todo-backend-configmap
+                  key: NATS_URL

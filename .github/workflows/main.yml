@@ -21,6 +21,7 @@ jobs:
       REMINDER_IMAGE: reminder
       IMAGE_WRITE_IMAGE: image-write
       IMAGE_READ_IMAGE: image-read
+      BROADCASTER_IMAGE: broadcaster
       TODO_APP_DEPLOYMENT: todo-app-dep
       TODO_BACKEND_DEPLOYMENT: todo-backend-dep
       NAMESPACE: ${{ github.ref_name == 'main' && 'project' || github.ref_name }}
@@ -80,6 +81,13 @@ jobs:
           docker push $READ_TAG
           echo "READ_TAG=$READ_TAG" >> $GITHUB_ENV
 
+      - name: Build & push broadcaster
+        run: |
+          BROADCASTER_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/${{ env.BROADCASTER_IMAGE }}:$BRANCH-$GITHUB_SHA
+          docker build -t $BROADCASTER_TAG ./todo_app/broadcaster
+          docker push $BROADCASTER_TAG
+          echo "BROADCASTER_TAG=$BROADCASTER_TAG" >> $GITHUB_ENV
+
       - name: Deploy
         run: |
           cd todo_app
@@ -87,6 +95,7 @@ jobs:
           kustomize edit set image reminder-image=$REMINDER_TAG
           kustomize edit set image image-write-image=$WRITE_TAG
           kustomize edit set image image-read-image=$READ_TAG
+          kustomize edit set image broadcaster-image=$BROADCASTER_TAG
           kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
           kustomize build . | kubectl apply -n $NAMESPACE -f -
           kubectl rollout status deployment $TODO_APP_DEPLOYMENT -n $NAMESPACE

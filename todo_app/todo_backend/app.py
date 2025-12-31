@@ -1,9 +1,11 @@
+import asyncio
 import json
 import logging
 import os
 import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
+import nats
 import psycopg2
 
 logger = logging.getLogger("todo-backend")
@@ -17,9 +19,11 @@ DB_PORT = int(os.environ.get("POSTGRES_PORT", 5432))
 DB_NAME = os.environ.get("POSTGRES_DB", "postgres")
 DB_USER = os.environ.get("POSTGRES_USER", "postgres")
 DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "")
+NATS_URL = os.environ.get("NATS_URL", "nats://my-nats:4222")
 
 conn = None
 cur = None
+nc = None
 
 
 def connect_db():
@@ -53,7 +57,38 @@ def connect_db():
         logger.error(f"DB connection failed: {e}")
 
 
+async def connect_nats():
+    global nc
+    try:
+        nc = await nats.connect(NATS_URL)
+        logger.info(f"Connected to NATS at {NATS_URL}")
+    except Exception as e:
+        nc = None
+        logger.error(f"NATS connection failed: {e}")
+
+
+def publish_message(message):
+    if nc is None:
+        logger.warning("NATS not connected")
+        return
+
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(nc.publish("todo-backend", message.encode()))
+        loop.close()
+        logger.info(f"Published to NATS: {message}")
+    except Exception as e:
+        logger.error(f"Failed to publish to NATS: {e}")
+
+
 connect_db()
+
+# Connect to NATS
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+loop.run_until_complete(connect_nats())
+loop.close()
 
 port = int(os.environ.get("TODO_BACKEND_PORT", 8080))
 logger.info("Built in GitHub actions and pushed to Artifact Registry")
@@ -119,6 +154,9 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(201)
             self.end_headers()
 
+            # Publish to NATS
+            publish_message(f"New todo created: {todo_item}")
+
             logger.info({"method": "POST", "path": self.path, "item_added": todo_item})
         else:
             self.send_response(404)
@@ -134,6 +172,9 @@ class Handler(BaseHTTPRequestHandler):
                 self.end_headers()
                 return
 
+            cur.execute("SELECT item FROM todos WHERE id = %s", (todo_id,))
+            row = cur.fetchone()
+
             cur.execute("UPDATE todos SET done = TRUE WHERE id = %s", (todo_id,))
             if cur.rowcount == 0:
                 self.send_response(404)
@@ -142,6 +183,11 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self.send_response(200)
                 self.end_headers()
+
+                if row:
+                    todo_item = row[0]
+                    publish_message(f"Todo marked as done: {todo_item}")
+
                 logger.info({"method": "PUT", "path": self.path, "todo_id": todo_id})
         else:
             self.send_response(404)

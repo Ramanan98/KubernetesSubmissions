@@ -6,6 +6,7 @@ resources:
   - todo_backend/manifests/configmap.yaml
   - todo_backend/manifests/deployment.yaml
   - todo_backend/manifests/service.yaml
+  - broadcaster/manifests/deployment.yaml
   - reminder/manifests/cronjob.yaml
   - manifests/backup-cronjob.yaml
   - manifests/configmap.yaml
@@ -26,4 +27,7 @@ images:
     newTag: latest
   - name: image-read-image
     newName: ramanan98/image-read
+    newTag: latest
+  - name: broadcaster-image
+    newName: ramanan98/broadcaster
     newTag: latest

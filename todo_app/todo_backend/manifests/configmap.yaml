@@ -10,3 +10,4 @@ data:
   POSTGRES_USER: "postgres"
   POSTGRES_PASSWORD: ""
   WIKI_URL: "https://en.wikipedia.org/wiki/Special:Random"
+  NATS_URL: "nats://my-nats:4222"
