@@ -1,10 +1,13 @@
+import asyncio
 import json
 import logging
 import os
-import socket
 import sys
+import threading
+import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
+import nats
 import psycopg2
 
 logger = logging.getLogger("todo-backend")
@@ -18,12 +21,12 @@ DB_PORT = int(os.environ.get("POSTGRES_PORT", 5432))
 DB_NAME = os.environ.get("POSTGRES_DB", "postgres")
 DB_USER = os.environ.get("POSTGRES_USER", "postgres")
 DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "")
-NATS_HOST = os.environ.get("NATS_HOST", "my-nats")
-NATS_PORT = int(os.environ.get("NATS_PORT", 4222))
+NATS_URL = os.environ.get("NATS_URL", "nats://my-nats:4222")
 
 conn = None
 cur = None
-nats_socket = None
+nc = None
+nats_loop = None
 
 
 def connect_db():
@@ -57,36 +60,49 @@ def connect_db():
         logger.error(f"DB connection failed: {e}")
 
 
-def connect_nats():
-    global nats_socket
+async def nats_worker():
+    global nc
     try:
-        nats_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        nats_socket.connect((NATS_HOST, NATS_PORT))
-        nats_socket.recv(4096)
-        nats_socket.sendall(
-            b'CONNECT {"verbose":false,"pedantic":false,"name":"todo-backend"}\r\n'
-        )
-        logger.info(f"Connected to NATS at {NATS_HOST}:{NATS_PORT}")
+        nc = await nats.connect(NATS_URL)
+        logger.info(f"Connected to NATS at {NATS_URL}")
+        while True:
+            await asyncio.sleep(1)
     except Exception as e:
-        nats_socket = None
         logger.error(f"NATS connection failed: {e}")
 
 
+def start_nats_thread():
+    global nats_loop
+
+    def run_loop():
+        global nats_loop
+        nats_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(nats_loop)
+        nats_loop.run_until_complete(nats_worker())
+
+    thread = threading.Thread(target=run_loop, daemon=True)
+    thread.start()
+    time.sleep(2)
+    logger.info("NATS thread started")
+
+
 def publish_message(message):
-    global nats_socket
+    if nc is None or nats_loop is None:
+        logger.warning("NATS not connected, skipping message publish")
+        return
 
     try:
-        payload = message.encode()
-        pub_cmd = f"PUB todo-backend {len(payload)}\r\n".encode()
-        nats_socket.sendall(pub_cmd + payload + b"\r\n")
+        future = asyncio.run_coroutine_threadsafe(
+            nc.publish("todo-backend", message.encode()), nats_loop
+        )
+        future.result(timeout=2)
         logger.info(f"Published to NATS: {message}")
     except Exception as e:
         logger.error(f"Failed to publish to NATS: {e}")
-        nats_socket = None
 
 
 connect_db()
-connect_nats()
+start_nats_thread()
 
 port = int(os.environ.get("TODO_BACKEND_PORT", 8080))
 logger.info("Built in GitHub actions and pushed to Artifact Registry")
@@ -152,7 +168,6 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(201)
             self.end_headers()
 
-            # Publish to NATS
             publish_message(f"New todo created: {todo_item}")
 
             logger.info({"method": "POST", "path": self.path, "item_added": todo_item})
@@ -182,7 +197,6 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.end_headers()
 
-                # Publish to NATS
                 if row:
                     todo_item = row[0]
                     publish_message(f"Todo completed: {todo_item}")
