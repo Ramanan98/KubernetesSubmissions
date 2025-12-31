@@ -36,7 +36,7 @@ async def main():
 
     async def handler(msg):
         message = msg.data.decode()
-        logger.info(f"Received message: {message}")
+        logger.info(f"Received message from subscriber: {message}")
         notify(message)
 
     await nc.subscribe("todo-backend", queue="broadcasters", cb=handler)
