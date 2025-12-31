@@ -1,11 +1,11 @@
 import json
 import logging
 import os
+import socket
 import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 import psycopg2
-import pynats
 
 logger = logging.getLogger("todo-backend")
 logger.setLevel(logging.INFO)
@@ -18,12 +18,12 @@ DB_PORT = int(os.environ.get("POSTGRES_PORT", 5432))
 DB_NAME = os.environ.get("POSTGRES_DB", "postgres")
 DB_USER = os.environ.get("POSTGRES_USER", "postgres")
 DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "")
-NATS_HOST = "my-nats"
-NATS_PORT = 4222
+NATS_HOST = os.environ.get("NATS_HOST", "my-nats")
+NATS_PORT = int(os.environ.get("NATS_PORT", 4222))
 
 conn = None
 cur = None
-nats_client = None
+nats_socket = None
 
 
 def connect_db():
@@ -58,27 +58,31 @@ def connect_db():
 
 
 def connect_nats():
-    global nats_client
+    global nats_socket
     try:
-        nats_client = pynats.NATSClient(
-            f"nats://{NATS_HOST}:{NATS_PORT}", socket_timeout=2
+        nats_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        nats_socket.connect((NATS_HOST, NATS_PORT))
+        nats_socket.recv(4096)
+        nats_socket.sendall(
+            b'CONNECT {"verbose":false,"pedantic":false,"name":"todo-backend"}\r\n'
         )
-        nats_client.connect()
         logger.info(f"Connected to NATS at {NATS_HOST}:{NATS_PORT}")
     except Exception as e:
-        nats_client = None
+        nats_socket = None
         logger.error(f"NATS connection failed: {e}")
 
 
 def publish_message(message):
-    global nats_client
+    global nats_socket
 
     try:
-        nats_client.publish("todo-backend", message.encode())
+        payload = message.encode()
+        pub_cmd = f"PUB todo-backend {len(payload)}\r\n".encode()
+        nats_socket.sendall(pub_cmd + payload + b"\r\n")
         logger.info(f"Published to NATS: {message}")
     except Exception as e:
         logger.error(f"Failed to publish to NATS: {e}")
-        nats_client = None
+        nats_socket = None
 
 
 connect_db()
@@ -148,6 +152,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(201)
             self.end_headers()
 
+            # Publish to NATS
             publish_message(f"New todo created: {todo_item}")
 
             logger.info({"method": "POST", "path": self.path, "item_added": todo_item})
@@ -177,6 +182,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.end_headers()
 
+                # Publish to NATS
                 if row:
                     todo_item = row[0]
                     publish_message(f"Todo completed: {todo_item}")
