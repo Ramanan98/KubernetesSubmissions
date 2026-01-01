@@ -87,3 +87,4 @@ jobs:
         with:
           add: "${{ steps.env.outputs.path }}/kustomization.yaml"
           message: "Update images to ${{ github.sha }}"
+          push: origin HEAD:main
