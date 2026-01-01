@@ -6,14 +6,30 @@ namespace: production
 namePrefix: prod-
 
 resources:
-  - ../../base
+- ../../base
 
 patches:
-  - path: todo-backend-configmap-patch.yaml
-    target:
-      kind: ConfigMap
-      name: todo-backend-configmap
-  - path: todo-app-configmap-patch.yaml
-    target:
-      kind: ConfigMap
-      name: todo-app-configmap
+- path: todo-backend-configmap-patch.yaml
+  target:
+    kind: ConfigMap
+    name: todo-backend-configmap
+- path: todo-app-configmap-patch.yaml
+  target:
+    kind: ConfigMap
+    name: todo-app-configmap
+images:
+- name: backend-image
+  newName: ramanan98/todo-backend
+  newTag: 8bebcc764f66731fe4293e75fc11a440f7070d21
+- name: broadcaster-image
+  newName: ramanan98/broadcaster
+  newTag: 8bebcc764f66731fe4293e75fc11a440f7070d21
+- name: image-read-image
+  newName: ramanan98/image-read
+  newTag: 8bebcc764f66731fe4293e75fc11a440f7070d21
+- name: image-write-image
+  newName: ramanan98/image-write
+  newTag: 8bebcc764f66731fe4293e75fc11a440f7070d21
+- name: reminder-image
+  newName: ramanan98/reminder
+  newTag: 8bebcc764f66731fe4293e75fc11a440f7070d21
