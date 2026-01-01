@@ -18,17 +18,17 @@ resources:
 images:
 - name: backend-image
   newName: ramanan98/todo-backend
-  newTag: 92b26248f31adf86cf5f5329f3a8b85fd2fe0055
+  newTag: aa6c1d8f089fde711cecbc31f74ed4de3c70dafc
 - name: broadcaster-image
   newName: ramanan98/broadcaster
-  newTag: 92b26248f31adf86cf5f5329f3a8b85fd2fe0055
+  newTag: aa6c1d8f089fde711cecbc31f74ed4de3c70dafc
 - name: image-read-image
   newName: ramanan98/image-read
-  newTag: 92b26248f31adf86cf5f5329f3a8b85fd2fe0055
+  newTag: aa6c1d8f089fde711cecbc31f74ed4de3c70dafc
 - name: image-write-image
   newName: ramanan98/image-write
-  newTag: 92b26248f31adf86cf5f5329f3a8b85fd2fe0055
+  newTag: aa6c1d8f089fde711cecbc31f74ed4de3c70dafc
 - name: reminder-image
   newName: ramanan98/reminder
-  newTag: 92b26248f31adf86cf5f5329f3a8b85fd2fe0055
+  newTag: aa6c1d8f089fde711cecbc31f74ed4de3c70dafc
 namespace: project
