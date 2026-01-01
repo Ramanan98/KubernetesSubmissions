@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: ping-pong-app
-          image: ramanan98/ping-pong:latest
+          image: ping-pong-image
           readinessProbe:
             initialDelaySeconds: 10
             periodSeconds: 5

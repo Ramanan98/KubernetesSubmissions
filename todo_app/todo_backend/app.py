@@ -60,10 +60,35 @@ def connect_db():
         logger.error(f"DB connection failed: {e}")
 
 
+async def nats_error_cb(e):
+    logger.error(f"NATS error: {e}")
+
+
+async def nats_disconnected_cb():
+    logger.warning("NATS disconnected")
+
+
+async def nats_reconnected_cb():
+    logger.info("NATS reconnected")
+
+
+async def nats_closed_cb():
+    logger.warning("NATS connection closed")
+
+
 async def nats_worker():
     global nc
     try:
-        nc = await nats.connect(NATS_URL)
+        nc = await nats.connect(
+            NATS_URL,
+            connect_timeout=5,
+            max_reconnect_attempts=3,
+            reconnect_time_wait=2,
+            error_cb=lambda e: logger.error(f"NATS error: {e}"),
+            disconnected_cb=lambda: logger.warning("NATS disconnected"),
+            reconnected_cb=lambda: logger.info("NATS reconnected"),
+            closed_cb=lambda: logger.warning("NATS connection closed"),
+        )
         logger.info(f"Connected to NATS at {NATS_URL}")
         while True:
             await asyncio.sleep(1)

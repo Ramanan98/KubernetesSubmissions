@@ -31,7 +31,16 @@ def notify(message):
 
 
 async def main():
-    nc = await nats.connect(NATS_URL)
+    nc = await nats.connect(
+        NATS_URL,
+        connect_timeout=5,
+        max_reconnect_attempts=3,
+        reconnect_time_wait=2,
+        error_cb=lambda e: logger.error(f"NATS error: {e}"),
+        disconnected_cb=lambda: logger.warning("NATS disconnected"),
+        reconnected_cb=lambda: logger.info("NATS reconnected"),
+        closed_cb=lambda: logger.warning("NATS connection closed"),
+    )
     logger.info(f"Connected to NATS at {NATS_URL}")
 
     async def handler(msg):

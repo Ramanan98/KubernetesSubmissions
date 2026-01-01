@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: exercises
+resources:
+  - manifests/gateway.yaml
+  - manifests/deployment.yaml
+  - manifests/service.yaml
+  - manifests/route.yaml
+images:
+  - name: ping-pong-image
+    newName: ramanan98/ping-pong
+    newTag: latest

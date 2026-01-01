@@ -1,0 +1,52 @@
+name: Build and publish application
+
+on:
+  push:
+
+jobs:
+  build-publish:
+    name: Build, Push, Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and publish ping pong app
+        run: |
+          cd ping_pong
+          docker build --tag "ramanan98/ping-pong:$GITHUB_SHA" .
+          docker push "ramanan98/ping-pong:$GITHUB_SHA"
+
+      - name: Build and publish log output app
+        run: |
+          cd log_output
+          docker build --tag "ramanan98/log-output:$GITHUB_SHA" .
+          docker push "ramanan98/log-output:$GITHUB_SHA"
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Use right image for ping pong
+        run: |
+          cd ping_pong
+          kustomize edit set image ping-pong-image=ramanan98/ping-pong:$GITHUB_SHA
+
+      - name: Use right image for log output
+        run: |
+          cd log_output
+          kustomize edit set image log-output-image=ramanan98/log-output:$GITHUB_SHA
+
+      - name: Commit kustomization.yaml files to GitHub
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: |
+            ping_pong/kustomization.yaml
+            log_output/kustomization.yaml
+          message: "New version released ${{ github.sha }}"
