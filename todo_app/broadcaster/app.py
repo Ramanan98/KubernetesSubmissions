@@ -30,16 +30,32 @@ def notify(message):
         logger.error(f"Error sending Telegram notification: {str(e)}")
 
 
+async def error_cb(e):
+    logger.error(f"NATS error: {e}")
+
+
+async def disconnected_cb():
+    logger.warning("NATS disconnected")
+
+
+async def reconnected_cb():
+    logger.info("NATS reconnected")
+
+
+async def closed_cb():
+    logger.warning("NATS connection closed")
+
+
 async def main():
     nc = await nats.connect(
         NATS_URL,
         connect_timeout=5,
         max_reconnect_attempts=3,
         reconnect_time_wait=2,
-        error_cb=lambda e: logger.error(f"NATS error: {e}"),
-        disconnected_cb=lambda: logger.warning("NATS disconnected"),
-        reconnected_cb=lambda: logger.info("NATS reconnected"),
-        closed_cb=lambda: logger.warning("NATS connection closed"),
+        error_cb=error_cb,
+        disconnected_cb=disconnected_cb,
+        reconnected_cb=reconnected_cb,
+        closed_cb=closed_cb,
     )
     logger.info(f"Connected to NATS at {NATS_URL}")
 
