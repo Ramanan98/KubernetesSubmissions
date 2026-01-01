@@ -7,3 +7,13 @@ namePrefix: prod-
 
 resources:
   - ../../base
+
+patches:
+  - path: todo-backend-configmap-patch.yaml
+    target:
+      kind: ConfigMap
+      name: todo-backend-configmap
+  - path: todo-app-configmap-patch.yaml
+    target:
+      kind: ConfigMap
+      name: todo-app-configmap
