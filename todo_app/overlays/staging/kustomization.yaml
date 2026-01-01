@@ -6,48 +6,57 @@ namespace: staging
 namePrefix: staging-
 
 resources:
-- ../../base
+  - ../../base
 
 patches:
-- path: broadcaster-patch.yaml
-  target:
-    kind: Deployment
-    name: broadcaster
-- path: todo-backend-configmap-patch.yaml
-  target:
-    kind: ConfigMap
-    name: todo-backend-configmap
-- path: todo-app-configmap-patch.yaml
-  target:
-    kind: ConfigMap
-    name: todo-app-configmap
+  - path: broadcaster-patch.yaml
+    target:
+      kind: Deployment
+      name: broadcaster
+  - path: todo-backend-configmap-patch.yaml
+    target:
+      kind: ConfigMap
+      name: todo-backend-configmap
+  - path: todo-app-configmap-patch.yaml
+    target:
+      kind: ConfigMap
+      name: todo-app-configmap
 
 patchesJson6902:
-- patch: |-
-    - op: replace
-      path: /metadata/name
-      value: disabled-backup
-    - op: replace
-      path: /spec/suspend
-      value: true
-  target:
-    group: batch
-    kind: CronJob
-    name: gcs-backup-postgres
-    version: v1
+  - patch: |-
+      - op: replace
+        path: /metadata/name
+        value: disabled-backup
+      - op: replace
+        path: /spec/suspend
+        value: true
+    target:
+      group: batch
+      kind: CronJob
+      name: gcs-backup-postgres
+      version: v1
+  - target:
+      group: gateway.networking.k8s.io
+      version: v1
+      kind: HTTPRoute
+      name: todo-app-route
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/backendRefs/0/name
+        value: staging-todo-app-svc
 images:
-- name: backend-image
-  newName: ramanan98/todo-backend
-  newTag: 3ad528e9dc84ecf1daa492f6729c413a55279f61
-- name: broadcaster-image
-  newName: ramanan98/broadcaster
-  newTag: 3ad528e9dc84ecf1daa492f6729c413a55279f61
-- name: image-read-image
-  newName: ramanan98/image-read
-  newTag: 3ad528e9dc84ecf1daa492f6729c413a55279f61
-- name: image-write-image
-  newName: ramanan98/image-write
-  newTag: 3ad528e9dc84ecf1daa492f6729c413a55279f61
-- name: reminder-image
-  newName: ramanan98/reminder
-  newTag: 3ad528e9dc84ecf1daa492f6729c413a55279f61
+  - name: backend-image
+    newName: ramanan98/todo-backend
+    newTag: 3ad528e9dc84ecf1daa492f6729c413a55279f61
+  - name: broadcaster-image
+    newName: ramanan98/broadcaster
+    newTag: 3ad528e9dc84ecf1daa492f6729c413a55279f61
+  - name: image-read-image
+    newName: ramanan98/image-read
+    newTag: 3ad528e9dc84ecf1daa492f6729c413a55279f61
+  - name: image-write-image
+    newName: ramanan98/image-write
+    newTag: 3ad528e9dc84ecf1daa492f6729c413a55279f61
+  - name: reminder-image
+    newName: ramanan98/reminder
+    newTag: 3ad528e9dc84ecf1daa492f6729c413a55279f61
