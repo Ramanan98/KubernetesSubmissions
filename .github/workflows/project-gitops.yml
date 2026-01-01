@@ -87,3 +87,25 @@ jobs:
         with:
           add: "${{ steps.env.outputs.path }}/kustomization.yaml"
           message: "Update images to ${{ github.sha }}"
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: "${{ secrets.GKE_SA_KEY }}"
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: dwk-cluster
+          project_id: ${{ secrets.GKE_PROJECT }}
+          location: europe-west4
+
+      - name: Apply ArgoCD Application for staging
+        if: steps.env.outputs.target == 'staging'
+        run: kubectl apply -f argocd/staging-application.yaml
+
+      - name: Apply ArgoCD Application for production
+        if: steps.env.outputs.target == 'prod'
+        run: kubectl apply -f argocd/production-application.yaml
