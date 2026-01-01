@@ -6,24 +6,40 @@ namespace: staging
 namePrefix: staging-
 
 resources:
-  - ../../base
+- ../../base
 
 patches:
-  - path: broadcaster-patch.yaml
-    target:
-      kind: Deployment
-      name: broadcaster
+- path: broadcaster-patch.yaml
+  target:
+    kind: Deployment
+    name: broadcaster
 
 patchesJson6902:
-  - target:
-      group: batch
-      version: v1
-      kind: CronJob
-      name: gcs-backup-postgres
-    patch: |-
-      - op: replace
-        path: /metadata/name
-        value: disabled-backup
-      - op: replace
-        path: /spec/suspend
-        value: true
+- patch: |-
+    - op: replace
+      path: /metadata/name
+      value: disabled-backup
+    - op: replace
+      path: /spec/suspend
+      value: true
+  target:
+    group: batch
+    kind: CronJob
+    name: gcs-backup-postgres
+    version: v1
+images:
+- name: backend-image
+  newName: ramanan98/todo-backend
+  newTag: 2563f783480d6d4556566a5174f9030472554b6a
+- name: broadcaster-image
+  newName: ramanan98/broadcaster
+  newTag: 2563f783480d6d4556566a5174f9030472554b6a
+- name: image-read-image
+  newName: ramanan98/image-read
+  newTag: 2563f783480d6d4556566a5174f9030472554b6a
+- name: image-write-image
+  newName: ramanan98/image-write
+  newTag: 2563f783480d6d4556566a5174f9030472554b6a
+- name: reminder-image
+  newName: ramanan98/reminder
+  newTag: 2563f783480d6d4556566a5174f9030472554b6a
