@@ -6,48 +6,48 @@ namespace: staging
 namePrefix: staging-
 
 resources:
-  - ../../base
+- ../../base
 
 patches:
-  - path: broadcaster-patch.yaml
-    target:
-      kind: Deployment
-      name: broadcaster
-  - path: todo-backend-configmap-patch.yaml
-    target:
-      kind: ConfigMap
-      name: todo-backend-configmap
-  - path: todo-app-configmap-patch.yaml
-    target:
-      kind: ConfigMap
-      name: todo-app-configmap
+- path: broadcaster-patch.yaml
+  target:
+    kind: Deployment
+    name: broadcaster
+- path: todo-backend-configmap-patch.yaml
+  target:
+    kind: ConfigMap
+    name: todo-backend-configmap
+- path: todo-app-configmap-patch.yaml
+  target:
+    kind: ConfigMap
+    name: todo-app-configmap
 
 patchesJson6902:
-  - patch: |-
-      - op: replace
-        path: /metadata/name
-        value: disabled-backup
-      - op: replace
-        path: /spec/suspend
-        value: true
-    target:
-      group: batch
-      kind: CronJob
-      name: gcs-backup-postgres
-      version: v1
+- patch: |-
+    - op: replace
+      path: /metadata/name
+      value: disabled-backup
+    - op: replace
+      path: /spec/suspend
+      value: true
+  target:
+    group: batch
+    kind: CronJob
+    name: gcs-backup-postgres
+    version: v1
 images:
-  - name: backend-image
-    newName: ramanan98/todo-backend
-    newTag: df1b212156a6bbdb2ab1f9304aff5f4ffff2c87e
-  - name: broadcaster-image
-    newName: ramanan98/broadcaster
-    newTag: df1b212156a6bbdb2ab1f9304aff5f4ffff2c87e
-  - name: image-read-image
-    newName: ramanan98/image-read
-    newTag: df1b212156a6bbdb2ab1f9304aff5f4ffff2c87e
-  - name: image-write-image
-    newName: ramanan98/image-write
-    newTag: df1b212156a6bbdb2ab1f9304aff5f4ffff2c87e
-  - name: reminder-image
-    newName: ramanan98/reminder
-    newTag: df1b212156a6bbdb2ab1f9304aff5f4ffff2c87e
+- name: backend-image
+  newName: ramanan98/todo-backend
+  newTag: 4c42d9b67fbe737619b4dd7d94d68cc85531d1cf
+- name: broadcaster-image
+  newName: ramanan98/broadcaster
+  newTag: 4c42d9b67fbe737619b4dd7d94d68cc85531d1cf
+- name: image-read-image
+  newName: ramanan98/image-read
+  newTag: 4c42d9b67fbe737619b4dd7d94d68cc85531d1cf
+- name: image-write-image
+  newName: ramanan98/image-write
+  newTag: 4c42d9b67fbe737619b4dd7d94d68cc85531d1cf
+- name: reminder-image
+  newName: ramanan98/reminder
+  newTag: 4c42d9b67fbe737619b4dd7d94d68cc85531d1cf
