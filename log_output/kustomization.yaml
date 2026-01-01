@@ -9,4 +9,4 @@ resources:
 images:
 - name: log-output-image
   newName: ramanan98/log-output
-  newTag: 0bdc6648650d14a606c4ee4197c9816455d42cb8
+  newTag: 6e30c743a52965ec42c117dffbaa06c2097654f9
