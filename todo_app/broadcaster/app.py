@@ -21,7 +21,7 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 def notify(message):
     if BROADCASTER_MODE == "log-only":
-        logger.info(f"Message (staging mode): {message}")
+        logger.info(f"Message (staging mode): {message}. Not notifying telegram.")
         return
 
     telegram_api_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
