@@ -11,6 +11,7 @@ port = int(os.environ.get("PORT", 8080))
 MESSAGE = os.environ.get("MESSAGE", "")
 INFO_FILE = "/config/information.txt"
 
+print("Version 2", flush=True)
 print(f"Server started on port {port}", flush=True)
 
 connection = False

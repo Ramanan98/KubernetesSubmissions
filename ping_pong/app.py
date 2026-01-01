@@ -47,6 +47,8 @@ def connect_db():
 
 connect_db()
 
+print("Version 2", flush=True)
+
 PORT = int(os.environ.get("PORT", 8080))
 print(f"Server started on port {PORT}", flush=True)
 
