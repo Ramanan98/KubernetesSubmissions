@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: staging
+
+namePrefix: staging-
+
+resources:
+  - ../../base
+
+patches:
+  - path: broadcaster-patch.yaml
+    target:
+      kind: Deployment
+      name: broadcaster
+
+patchesJson6902:
+  - target:
+      group: batch
+      version: v1
+      kind: CronJob
+      name: gcs-backup-postgres
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: disabled-backup
+      - op: replace
+        path: /spec/suspend
+        value: true

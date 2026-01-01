@@ -14,11 +14,16 @@ logging.basicConfig(
 logger = logging.getLogger("broadcaster")
 
 NATS_URL = os.getenv("NATS_URL", "nats://my-nats:4222")
+BROADCASTER_MODE = os.getenv("BROADCASTER_MODE", "forward")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 
 def notify(message):
+    if BROADCASTER_MODE == "log-only":
+        logger.info(f"Message (staging mode): {message}")
+        return
+
     telegram_api_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "HTML"}
 

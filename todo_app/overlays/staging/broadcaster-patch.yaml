@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broadcaster
+spec:
+  template:
+    spec:
+      containers:
+        - name: broadcaster
+          env:
+            - name: NATS_URL
+              value: "nats://my-nats:4222"
+            - name: BROADCASTER_MODE
+              value: "log-only"

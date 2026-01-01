@@ -51,18 +51,39 @@ jobs:
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2
 
-      - name: Update images in kustomization.yaml
+      - name: Determine target environment
+        id: env
         run: |
-          cd todo_app
+          if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
+            echo "target=prod" >> $GITHUB_OUTPUT
+            echo "path=todo_app/overlays/prod" >> $GITHUB_OUTPUT
+          else
+            echo "target=staging" >> $GITHUB_OUTPUT
+            echo "path=todo_app/overlays/staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update images in staging kustomization
+        if: steps.env.outputs.target == 'staging'
+        run: |
+          cd todo_app/overlays/staging
           kustomize edit set image backend-image=ramanan98/todo-backend:$GITHUB_SHA
           kustomize edit set image reminder-image=ramanan98/reminder:$GITHUB_SHA
           kustomize edit set image image-write-image=ramanan98/image-write:$GITHUB_SHA
           kustomize edit set image image-read-image=ramanan98/image-read:$GITHUB_SHA
           kustomize edit set image broadcaster-image=ramanan98/broadcaster:$GITHUB_SHA
-          kustomize edit set namespace project
+
+      - name: Update images in prod kustomization
+        if: steps.env.outputs.target == 'prod'
+        run: |
+          cd todo_app/overlays/prod
+          kustomize edit set image backend-image=ramanan98/todo-backend:$GITHUB_SHA
+          kustomize edit set image reminder-image=ramanan98/reminder:$GITHUB_SHA
+          kustomize edit set image image-write-image=ramanan98/image-write:$GITHUB_SHA
+          kustomize edit set image image-read-image=ramanan98/image-read:$GITHUB_SHA
+          kustomize edit set image broadcaster-image=ramanan98/broadcaster:$GITHUB_SHA
 
       - name: Commit kustomization.yaml to GitHub
         uses: EndBug/add-and-commit@v9
         with:
-          add: "todo_app/kustomization.yaml"
+          add: "${{ steps.env.outputs.path }}/kustomization.yaml"
           message: "Update images to ${{ github.sha }}"
