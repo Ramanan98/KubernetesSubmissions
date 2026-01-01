@@ -1,33 +1,34 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - postgres/manifests/service.yaml
-  - postgres/manifests/statefulset.yaml
-  - todo_backend/manifests/configmap.yaml
-  - todo_backend/manifests/deployment.yaml
-  - todo_backend/manifests/service.yaml
-  - broadcaster/manifests/deployment.yaml
-  - reminder/manifests/cronjob.yaml
-  - manifests/backup-cronjob.yaml
-  - manifests/configmap.yaml
-  - manifests/persistentvolumeclaim.yaml
-  - manifests/deployment.yaml
-  - manifests/service.yaml
-  - manifests/gateway.yaml
-  - manifests/route.yaml
+- postgres/manifests/service.yaml
+- postgres/manifests/statefulset.yaml
+- todo_backend/manifests/configmap.yaml
+- todo_backend/manifests/deployment.yaml
+- todo_backend/manifests/service.yaml
+- broadcaster/manifests/deployment.yaml
+- reminder/manifests/cronjob.yaml
+- manifests/backup-cronjob.yaml
+- manifests/configmap.yaml
+- manifests/persistentvolumeclaim.yaml
+- manifests/deployment.yaml
+- manifests/service.yaml
+- manifests/gateway.yaml
+- manifests/route.yaml
 images:
-  - name: backend-image
-    newName: ramanan98/todo-backend
-    newTag: latest
-  - name: reminder-image
-    newName: ramanan98/reminder
-    newTag: latest
-  - name: image-write-image
-    newName: ramanan98/image-write
-    newTag: latest
-  - name: image-read-image
-    newName: ramanan98/image-read
-    newTag: latest
-  - name: broadcaster-image
-    newName: ramanan98/broadcaster
-    newTag: latest
+- name: backend-image
+  newName: ramanan98/todo-backend
+  newTag: 92b26248f31adf86cf5f5329f3a8b85fd2fe0055
+- name: broadcaster-image
+  newName: ramanan98/broadcaster
+  newTag: 92b26248f31adf86cf5f5329f3a8b85fd2fe0055
+- name: image-read-image
+  newName: ramanan98/image-read
+  newTag: 92b26248f31adf86cf5f5329f3a8b85fd2fe0055
+- name: image-write-image
+  newName: ramanan98/image-write
+  newTag: 92b26248f31adf86cf5f5329f3a8b85fd2fe0055
+- name: reminder-image
+  newName: ramanan98/reminder
+  newTag: 92b26248f31adf86cf5f5329f3a8b85fd2fe0055
+namespace: project
