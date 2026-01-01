@@ -61,3 +61,4 @@
 - [4.5](https://github.com/Ramanan98/KubernetesSubmissions/tree/4.5/todo_app)
 - [4.6](https://github.com/Ramanan98/KubernetesSubmissions/tree/4.6/todo_app/broadcaster)
 - [4.7](https://github.com/Ramanan98/KubernetesSubmissions/tree/4.7/.github/workflows/gitops.yml)
+- [4.8](https://github.com/Ramanan98/KubernetesSubmissions/tree/4.8/.github/workflows/project-gitops.yml)
