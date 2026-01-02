@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: reminder
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: reminder
+              env:
+                - name: POSTGRES_HOST
+                  value: "prod-postgres-svc"
+                - name: POSTGRES_PORT
+                  value: "5432"
+                - name: POSTGRES_DB
+                  value: "postgres"
+                - name: POSTGRES_USER
+                  value: "postgres"
+                - name: POSTGRES_PASSWORD
+                  value: ""
