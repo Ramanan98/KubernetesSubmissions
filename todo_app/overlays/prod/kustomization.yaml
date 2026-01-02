@@ -32,6 +32,9 @@ patchesJson6902:
       - op: replace
         path: /spec/rules/0/backendRefs/0/name
         value: prod-todo-app-svc
+      - op: replace
+        path: /spec/parentRefs/0/name
+        value: prod-dwk-material-gateway
 
 images:
   - name: backend-image
