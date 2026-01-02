@@ -12,6 +12,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Checkout application code repo
+        uses: actions/checkout@v4
+        with:
+          repository: Ramanan98/KubernetesSubmissions-code
+          path: code
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -20,31 +26,31 @@ jobs:
 
       - name: Build and publish todo_backend
         run: |
-          cd todo_app/todo_backend
+          cd code/todo_backend
           docker build --tag "ramanan98/todo-backend:$GITHUB_SHA" .
           docker push "ramanan98/todo-backend:$GITHUB_SHA"
 
       - name: Build and publish reminder
         run: |
-          cd todo_app/reminder
+          cd code/reminder
           docker build --tag "ramanan98/reminder:$GITHUB_SHA" .
           docker push "ramanan98/reminder:$GITHUB_SHA"
 
       - name: Build and publish image_write
         run: |
-          cd todo_app/image_write
+          cd code/image_write
           docker build --tag "ramanan98/image-write:$GITHUB_SHA" .
           docker push "ramanan98/image-write:$GITHUB_SHA"
 
       - name: Build and publish image_read
         run: |
-          cd todo_app/image_read
+          cd code/image_read
           docker build --tag "ramanan98/image-read:$GITHUB_SHA" .
           docker push "ramanan98/image-read:$GITHUB_SHA"
 
       - name: Build and publish broadcaster
         run: |
-          cd todo_app/broadcaster
+          cd code/broadcaster
           docker build --tag "ramanan98/broadcaster:$GITHUB_SHA" .
           docker push "ramanan98/broadcaster:$GITHUB_SHA"
 
