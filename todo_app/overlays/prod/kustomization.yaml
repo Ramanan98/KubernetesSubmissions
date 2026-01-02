@@ -6,49 +6,49 @@ namespace: production
 namePrefix: prod-
 
 resources:
-  - ../../base
+- ../../base
 
 patches:
-  - path: reminder-patch.yaml
-    target:
-      kind: CronJob
-      name: reminder
-  - path: todo-backend-configmap-patch.yaml
-    target:
-      kind: ConfigMap
-      name: todo-backend-configmap
-  - path: todo-app-configmap-patch.yaml
-    target:
-      kind: ConfigMap
-      name: todo-app-configmap
+- path: reminder-patch.yaml
+  target:
+    kind: CronJob
+    name: reminder
+- path: todo-backend-configmap-patch.yaml
+  target:
+    kind: ConfigMap
+    name: todo-backend-configmap
+- path: todo-app-configmap-patch.yaml
+  target:
+    kind: ConfigMap
+    name: todo-app-configmap
 
 patchesJson6902:
-  - target:
-      group: gateway.networking.k8s.io
-      version: v1
-      kind: HTTPRoute
-      name: todo-app-route
-    patch: |-
-      - op: replace
-        path: /spec/rules/0/backendRefs/0/name
-        value: prod-todo-app-svc
-      - op: replace
-        path: /spec/parentRefs/0/name
-        value: prod-dwk-material-gateway
+- patch: |-
+    - op: replace
+      path: /spec/rules/0/backendRefs/0/name
+      value: prod-todo-app-svc
+    - op: replace
+      path: /spec/parentRefs/0/name
+      value: prod-dwk-material-gateway
+  target:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: todo-app-route
+    version: v1
 
 images:
-  - name: backend-image
-    newName: ramanan98/todo-backend
-    newTag: 8bebcc764f66731fe4293e75fc11a440f7070d21
-  - name: broadcaster-image
-    newName: ramanan98/broadcaster
-    newTag: 8bebcc764f66731fe4293e75fc11a440f7070d21
-  - name: image-read-image
-    newName: ramanan98/image-read
-    newTag: 8bebcc764f66731fe4293e75fc11a440f7070d21
-  - name: image-write-image
-    newName: ramanan98/image-write
-    newTag: 8bebcc764f66731fe4293e75fc11a440f7070d21
-  - name: reminder-image
-    newName: ramanan98/reminder
-    newTag: 8bebcc764f66731fe4293e75fc11a440f7070d21
+- name: backend-image
+  newName: ramanan98/todo-backend
+  newTag: aae8535cbedd5d830f2a66f184f2b20e1a60bc50
+- name: broadcaster-image
+  newName: ramanan98/broadcaster
+  newTag: aae8535cbedd5d830f2a66f184f2b20e1a60bc50
+- name: image-read-image
+  newName: ramanan98/image-read
+  newTag: aae8535cbedd5d830f2a66f184f2b20e1a60bc50
+- name: image-write-image
+  newName: ramanan98/image-write
+  newTag: aae8535cbedd5d830f2a66f184f2b20e1a60bc50
+- name: reminder-image
+  newName: ramanan98/reminder
+  newTag: aae8535cbedd5d830f2a66f184f2b20e1a60bc50
