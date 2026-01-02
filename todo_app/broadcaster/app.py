@@ -6,6 +6,9 @@ import sys
 import nats
 import requests
 
+# -------------------
+# Logging
+# -------------------
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(message)s",
@@ -13,68 +16,65 @@ logging.basicConfig(
 )
 logger = logging.getLogger("broadcaster")
 
+# -------------------
+# Config
+# -------------------
 NATS_URL = os.getenv("NATS_URL", "nats://my-nats:4222")
 BROADCASTER_MODE = os.getenv("BROADCASTER_MODE", "forward")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 
-def notify(message):
+# -------------------
+# Telegram
+# -------------------
+def notify(message: str):
     if BROADCASTER_MODE == "log-only":
-        logger.info(f"Message (staging mode): {message}. Not notifying telegram.")
+        logger.info(f"(log-only) {message}")
         return
 
-    telegram_api_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "HTML"}
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": message,
+        "parse_mode": "HTML",
+    }
 
     try:
-        response = requests.post(telegram_api_url, json=payload, timeout=10)
-        response.raise_for_status()
-        logger.info(f"Telegram notification sent: {message}")
+        r = requests.post(url, json=payload, timeout=10)
+        r.raise_for_status()
+        logger.info("Telegram notification sent")
     except Exception as e:
-        logger.error(f"Error sending Telegram notification: {str(e)}")
+        logger.error(f"Telegram notify failed: {e}")
 
 
-async def error_cb(e):
-    logger.error(f"NATS error: {e}")
-
-
-async def disconnected_cb():
-    logger.warning("NATS disconnected")
-
-
-async def reconnected_cb():
-    logger.info("NATS reconnected")
-
-
-async def closed_cb():
-    logger.warning("NATS connection closed")
-
-
+# -------------------
+# NATS
+# -------------------
 async def main():
-    nc = await nats.connect(
-        NATS_URL,
-        connect_timeout=5,
-        max_reconnect_attempts=3,
-        reconnect_time_wait=2,
-        error_cb=error_cb,
-        disconnected_cb=disconnected_cb,
-        reconnected_cb=reconnected_cb,
-        closed_cb=closed_cb,
-    )
+    nc = await nats.connect(NATS_URL, connect_timeout=5)
     logger.info(f"Connected to NATS at {NATS_URL}")
+    logger.info("Saved locally")
 
     async def handler(msg):
         message = msg.data.decode()
-        logger.info(f"Received message from subscriber: {message}")
+        logger.info(f"Received: {message}")
         notify(message)
 
-    await nc.subscribe("todo-backend", queue="broadcasters", cb=handler)
-    logger.info("Subscriber started with queue group 'broadcasters'")
+    await nc.subscribe(
+        subject="todo-backend",
+        queue="broadcasters",
+        cb=handler,
+    )
 
-    while True:
-        await asyncio.sleep(3600)
+    logger.info("Subscriber started (queue=broadcasters)")
+
+    # Block forever
+    await asyncio.Event().wait()
 
 
+# -------------------
+# Entrypoint
+# -------------------
 if __name__ == "__main__":
     asyncio.run(main())
