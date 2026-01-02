@@ -22,6 +22,17 @@ patches:
       kind: ConfigMap
       name: todo-app-configmap
 
+patchesJson6902:
+  - target:
+      group: gateway.networking.k8s.io
+      version: v1
+      kind: HTTPRoute
+      name: todo-app-route
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/backendRefs/0/name
+        value: prod-todo-app-svc
+
 images:
   - name: backend-image
     newName: ramanan98/todo-backend

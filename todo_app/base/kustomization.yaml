@@ -16,13 +16,6 @@ resources:
   - gateway.yaml
   - route.yaml
 
-nameReference:
-  - kind: HTTPRoute
-    group: gateway.networking.k8s.io
-    version: v1
-    fieldSpecs:
-      - path: spec/rules/backendRefs/name
-
 images:
   - name: backend-image
     newName: ramanan98/todo-backend
