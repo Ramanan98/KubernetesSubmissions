@@ -54,16 +54,16 @@ patchesJson6902:
 images:
 - name: backend-image
   newName: ramanan98/todo-backend
-  newTag: b4da9b15f76201853e95cc4fd96a8ed9e282603b
+  newTag: cbfbd62fb81771784225872158d05db296d012df
 - name: broadcaster-image
   newName: ramanan98/broadcaster
-  newTag: b4da9b15f76201853e95cc4fd96a8ed9e282603b
+  newTag: cbfbd62fb81771784225872158d05db296d012df
 - name: image-read-image
   newName: ramanan98/image-read
-  newTag: b4da9b15f76201853e95cc4fd96a8ed9e282603b
+  newTag: cbfbd62fb81771784225872158d05db296d012df
 - name: image-write-image
   newName: ramanan98/image-write
-  newTag: b4da9b15f76201853e95cc4fd96a8ed9e282603b
+  newTag: cbfbd62fb81771784225872158d05db296d012df
 - name: reminder-image
   newName: ramanan98/reminder
-  newTag: b4da9b15f76201853e95cc4fd96a8ed9e282603b
+  newTag: cbfbd62fb81771784225872158d05db296d012df
