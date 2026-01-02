@@ -6,64 +6,64 @@ namespace: staging
 namePrefix: staging-
 
 resources:
-  - ../../base
+- ../../base
 
 patches:
-  - path: broadcaster-patch.yaml
-    target:
-      kind: Deployment
-      name: broadcaster
-  - path: reminder-patch.yaml
-    target:
-      kind: CronJob
-      name: reminder
-  - path: todo-backend-configmap-patch.yaml
-    target:
-      kind: ConfigMap
-      name: todo-backend-configmap
-  - path: todo-app-configmap-patch.yaml
-    target:
-      kind: ConfigMap
-      name: todo-app-configmap
+- path: broadcaster-patch.yaml
+  target:
+    kind: Deployment
+    name: broadcaster
+- path: reminder-patch.yaml
+  target:
+    kind: CronJob
+    name: reminder
+- path: todo-backend-configmap-patch.yaml
+  target:
+    kind: ConfigMap
+    name: todo-backend-configmap
+- path: todo-app-configmap-patch.yaml
+  target:
+    kind: ConfigMap
+    name: todo-app-configmap
 
 patchesJson6902:
-  - patch: |-
-      - op: replace
-        path: /metadata/name
-        value: disabled-backup
-      - op: replace
-        path: /spec/suspend
-        value: true
-    target:
-      group: batch
-      kind: CronJob
-      name: gcs-backup-postgres
-      version: v1
-  - patch: |-
-      - op: replace
-        path: /spec/rules/0/backendRefs/0/name
-        value: staging-todo-app-svc
-      - op: replace
-        path: /spec/parentRefs/0/name
-        value: staging-dwk-material-gateway
-    target:
-      group: gateway.networking.k8s.io
-      kind: HTTPRoute
-      name: todo-app-route
-      version: v1
+- patch: |-
+    - op: replace
+      path: /metadata/name
+      value: disabled-backup
+    - op: replace
+      path: /spec/suspend
+      value: true
+  target:
+    group: batch
+    kind: CronJob
+    name: gcs-backup-postgres
+    version: v1
+- patch: |-
+    - op: replace
+      path: /spec/rules/0/backendRefs/0/name
+      value: staging-todo-app-svc
+    - op: replace
+      path: /spec/parentRefs/0/name
+      value: staging-dwk-material-gateway
+  target:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: todo-app-route
+    version: v1
 images:
-  - name: backend-image
-    newName: ramanan98/todo-backend
-    newTag: 7554a6074e24c5022a13659b3705c38d54de5295
-  - name: broadcaster-image
-    newName: ramanan98/broadcaster
-    newTag: 7554a6074e24c5022a13659b3705c38d54de5295
-  - name: image-read-image
-    newName: ramanan98/image-read
-    newTag: 7554a6074e24c5022a13659b3705c38d54de5295
-  - name: image-write-image
-    newName: ramanan98/image-write
-    newTag: 7554a6074e24c5022a13659b3705c38d54de5295
-  - name: reminder-image
-    newName: ramanan98/reminder
-    newTag: 7554a6074e24c5022a13659b3705c38d54de5295
+- name: backend-image
+  newName: ramanan98/todo-backend
+  newTag: 96a468a8e12d2c427b5c7154ab4e530ca56dd52b
+- name: broadcaster-image
+  newName: ramanan98/broadcaster
+  newTag: 96a468a8e12d2c427b5c7154ab4e530ca56dd52b
+- name: image-read-image
+  newName: ramanan98/image-read
+  newTag: 96a468a8e12d2c427b5c7154ab4e530ca56dd52b
+- name: image-write-image
+  newName: ramanan98/image-write
+  newTag: 96a468a8e12d2c427b5c7154ab4e530ca56dd52b
+- name: reminder-image
+  newName: ramanan98/reminder
+  newTag: 96a468a8e12d2c427b5c7154ab4e530ca56dd52b
