@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-dep
+  namespace: exercises
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wiki
+  template:
+    metadata:
+      labels:
+        app: wiki
+    spec:
+      initContainers:
+        - name: init-wiki
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              curl -L -H "User-Agent: RandomWikiScript/1.0 (my_email@example.com)" -o /usr/share/nginx/html/index.html https://en.wikipedia.org/wiki/Kubernetes
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+        - name: sidecar-wiki
+          image: curlimages/curl:latest
+          restartPolicy: Always
+          command:
+            - sh
+            - -c
+            - |
+              while true; do
+                sleep $((300 + RANDOM % 900))
+                curl -L -H "User-Agent: RandomWikiScript/1.0 (my_email@example.com)" -o /usr/share/nginx/html/index.html https://en.wikipedia.org/wiki/Special:Random
+              done
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: html
+          emptyDir: {}
