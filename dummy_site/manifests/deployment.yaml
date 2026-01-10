@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dummysite-controller-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dummysite-controller
+  template:
+    metadata:
+      labels:
+        app: dummysite-controller
+    spec:
+      serviceAccountName: dummysite-controller-account
+      containers:
+        - name: dummysite-controller
+          image: ramanan98/dummysite-controller@sha256:aed84053048327de327199d776786a8bdf1b28fd3df2779ebf82e2e467f8317a
