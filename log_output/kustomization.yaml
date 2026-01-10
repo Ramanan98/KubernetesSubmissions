@@ -2,11 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: exercises
 resources:
-- manifests/configmap.yaml
-- manifests/deployment.yaml
-- manifests/service.yaml
-- manifests/route.yaml
+  - manifests/configmap.yaml
+  - manifests/deployment.yaml
+  - manifests/service.yaml
+  - manifests/route.yaml
 images:
-- name: log-output-image
-  newName: ramanan98/log-output
-  newTag: 6e30c743a52965ec42c117dffbaa06c2097654f9
+  - name: log-output-image
+    newName: ramanan98/log-output
+    newTag: "5.3"

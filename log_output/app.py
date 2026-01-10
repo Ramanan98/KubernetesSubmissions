@@ -37,6 +37,12 @@ class Handler(BaseHTTPRequestHandler):
             ping_pong_requests = res.read().decode()
             conn.close()
 
+            conn = http.client.HTTPConnection("greeter-svc", 2345)
+            conn.request("GET", "/")
+            res = conn.getresponse()
+            greeting = res.read().decode()
+            conn.close()
+
             file_content = ""
             with open(INFO_FILE, "r") as f:
                 file_content = f.read().strip()
@@ -48,7 +54,8 @@ class Handler(BaseHTTPRequestHandler):
                 f"{file_content}\n"
                 f"{MESSAGE}\n"
                 f"{datetime.now().isoformat()}: {s}.\n"
-                f"Ping / Pongs: {ping_pong_requests}"
+                f"Ping / Pongs: {ping_pong_requests}\n"
+                f"greetings: {greeting}"
             )
 
             self.wfile.write(response.encode())

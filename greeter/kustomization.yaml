@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: exercises
+resources:
+  - manifests/deployment-v1.yaml
+  - manifests/deployment-v2.yaml
+  - manifests/service.yaml
+  - manifests/route.yaml
+images:
+  - name: greeter-image
+    newName: ramanan98/greeter@sha256:f422fd851d9bfb67f0ea5f75cfea17980fde391793275bcb99198904d7b4770c
