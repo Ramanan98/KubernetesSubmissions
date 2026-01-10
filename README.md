@@ -69,4 +69,4 @@
 
 - [5.1](https://github.com/Ramanan98/KubernetesSubmissions/tree/5.1/dummy_site)
 - [5.2](https://github.com/Ramanan98/KubernetesSubmissions/tree/5.2)
-- [5.2](https://github.com/Ramanan98/KubernetesSubmissions/tree/5.3/greeter)
+- [5.3](https://github.com/Ramanan98/KubernetesSubmissions/tree/5.3/greeter)
