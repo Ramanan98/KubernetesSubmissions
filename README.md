@@ -68,3 +68,4 @@
 ### Chapter 6
 
 - [5.1](https://github.com/Ramanan98/KubernetesSubmissions/tree/5.1/dummy_site)
+- [5.2](https://github.com/Ramanan98/KubernetesSubmissions/tree/5.2)
