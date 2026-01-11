@@ -1,0 +1,30 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: ping-pong-app-dep
+  namespace: exercises
+spec:
+  template:
+    spec:
+      containers:
+        - image: ping-pong-image
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+            httpGet:
+              path: /healthz
+              port: 8080
+          env:
+            - name: POSTGRES_HOST
+              value: "postgres-svc.exercises.svc.cluster.local"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: "postgres"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: ""
+          ports:
+            - containerPort: 8080
